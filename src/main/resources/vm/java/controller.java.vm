@@ -1,0 +1,475 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.web.controller.${table.moduleName};
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Parameter;
+import project.extension.openapi.annotations.*;
+import project.extension.openapi.fastjson.ApiDataSchemaExtension;
+import project.extension.openapi.fastjson.JsonExtension;
+import project.extension.openapi.model.ApiData.*;
+#if($export)
+import project.extension.office.excel.ExcelVersion;
+#end
+import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.ApiResultData;
+import com.ruoyi.common.exception.ServiceException;
+#if($tree)
+import com.ruoyi.dto.utils.TreeDataSearchDTO;
+#else
+import com.ruoyi.dto.utils.DataSearchDTO;
+#end
+#if($sort)
+import com.ruoyi.dto.utils.DataSortDTO;
+    #if($tree)
+import com.ruoyi.dto.utils.TreeDragSortDTO;
+    #else
+import com.ruoyi.dto.utils.DragSortDTO;
+    #end
+#end
+import ${packageName}.service.${table.moduleName}.I${table.businessName}Service;
+import ${packageName}.dto.${table.moduleName}.${businessName_lower}DTO.*;
+
+import java.util.Collection;
+
+/**
+ * ${table.title}服务控制器
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+@RestController
+@RequestMapping(path = "${routePath}",
+                consumes = "application/json",
+                produces = "application/json")
+@Scope("prototype")
+@Api(tags = "${table.title}")
+@OpenApiGroup("${table.group}")
+public class ${table.businessName}Controller
+        extends BaseController {
+    private final I${table.businessName}Service ${businessName_lower}Service;
+
+    public ${table.businessName}Controller(I${table.businessName}Service ${businessName_lower}Service) {
+        this.${businessName_lower}Service = ${businessName_lower}Service;
+    }
+#if($tree)
+
+    /**
+     * 树状列表数据
+     *
+     * @param dataSearch 搜索参数
+     * @return 树状列表数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:tree-list')")
+    @PostMapping("/tree-list")
+    @ApiOperation("获取树状列表数据")
+    @OpenApiModels(defaultGenericTypes = {@OpenApiGenericType(arguments = {@OpenApiGenericTypeArgument(List.class)})},
+                   defaultDescription = "树状列表数据",
+                   value = {@OpenApiModel(type = RuoyiResult.class,
+                                          summary = "Ruoyi框架数据结构方案（默认）",
+                                          defaultModel = true),
+                            @OpenApiModel(type = LayuiResult.class,
+                                          summary = "Layui数据结构方案"),
+                            @OpenApiModel(type = JqGridResult.class,
+                                          summary = "JqGrid数据结构方案"),
+                            @OpenApiModel(type = EasyuiResult.class,
+                                          summary = "Easyui、BootstrapTable数据结构方案"),
+                            @OpenApiModel(type = AntdVueResult.class,
+                                          summary = "AntdVue数据结构方案"),
+                            @OpenApiModel(type = ElementVueResult.class,
+                                          summary = "ElementVue数据结构方案")})
+    public Object treeList(
+            @OpenApiModel(description = "搜索参数")
+            @RequestBody
+                    TreeDataSearchDTO dataSearch)
+            throws
+            ServiceException {
+        return JsonExtension.toOpenApiJson(ApiDataSchemaExtension.buildResult(dataSearch.getSchema(),
+                                                                              ${businessName_lower}Service.treeList(dataSearch),
+                                                                              dataSearch.getPagination()),
+                                           List.class);
+    }
+#else
+
+    /**
+     * 列表数据
+     *
+     * @param dataSearch 搜索参数
+     * @return 列表数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:list')")
+    @PostMapping("/list")
+    @ApiOperation("获取列表数据")
+    @OpenApiModels(
+            defaultDescription = "列表数据",
+            defaultGenericTypes = {@OpenApiGenericType(arguments = {@OpenApiGenericTypeArgument(List.class)})},
+            value = {@OpenApiModel(type = RuoyiResult.class,
+                                   summary = "Ruoyi框架数据结构方案（默认）",
+                                   defaultModel = true),
+                     @OpenApiModel(type = LayuiResult.class,
+                                   summary = "Layui数据结构方案"),
+                     @OpenApiModel(type = JqGridResult.class,
+                                   summary = "JqGrid数据结构方案"),
+                     @OpenApiModel(type = EasyuiResult.class,
+                                   summary = "Easyui、BootstrapTable数据结构方案"),
+                     @OpenApiModel(type = AntdVueResult.class,
+                                   summary = "AntdVue数据结构方案"),
+                     @OpenApiModel(type = ElementVueResult.class,
+                                   summary = "ElementVue数据结构方案")})
+    public Object list(
+            @OpenApiModel(description = "搜索参数")
+            @RequestBody
+                    DataSearchDTO dataSearch)
+            throws
+            ServiceException {
+        return JsonExtension.toOpenApiJson(
+                ApiDataSchemaExtension.buildResult(dataSearch.getSchema(),
+                                                   ${businessName_lower}Service.list(dataSearch),
+                                                   dataSearch.getPagination()),
+                List.class);
+    }
+#end
+
+    /**
+     * 详情数据
+     *
+     * @param id 主键
+     * @return 详情数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:detail')")
+    @GetMapping(value = "/detail/{id}",
+                consumes = "*/*")
+    @ApiOperation("获取详情数据")
+    @OpenApiModel(value = Detail.class,
+                  description = "详情数据")
+    public Object detail(
+            @Parameter(name = "id",
+                       description = "主键")
+            @PathVariable("id")
+                    String id)
+            throws
+            ServiceException {
+        return JsonExtension.toOpenApiJson(ApiResultData.success(${businessName_lower}Service.detail(id)),
+                                           Detail.class);
+    }
+
+    /**
+     * 新增
+     *
+     * @param data 数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:create')")
+    @PostMapping("/create")
+    @ApiOperation("新增")
+    public Object create(
+            @OpenApiModel(description = "数据")
+            @RequestBody
+                    Create data)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.create(data);
+        return ApiResultData.success();
+    }
+
+    /**
+     * 获取编辑数据
+     *
+     * @param id 主键
+     * @return 编辑数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:edit')")
+    @GetMapping(value = "/edit/{id}",
+                consumes = "*/*")
+    @ApiOperation("获取编辑数据")
+    @OpenApiModel(value = Edit.class,
+                  description = "编辑数据")
+    public Object edit(
+            @Parameter(name = "id",
+                       description = "主键")
+            @PathVariable("id")
+                    String id)
+            throws
+            ServiceException {
+        return JsonExtension.toOpenApiJson(ApiResultData.success(${businessName_lower}Service.edit(id)),
+                                           Edit.class);
+    }
+
+    /**
+     * 编辑
+     *
+     * @param data 数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:edit')")
+    @PostMapping("/edit")
+    @ApiOperation("编辑")
+    public Object edit(
+            @OpenApiModel(description = "数据")
+            @RequestBody
+                    Edit data)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.edit(data);
+        return ApiResultData.success();
+    }
+
+    /**
+     * 删除
+     *
+     * @param ids 主键集合
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:delete')")
+    @PostMapping("/delete")
+    @ApiOperation("删除")
+    public Object delete(
+            @RequestBody
+                    Collection<String> ids)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.delete(ids);
+        return ApiResultData.success();
+    }
+#if($sort)
+
+    /**
+     * 排序
+     *
+     * @param data 数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:sort')")
+    @PostMapping("/sort")
+    @ApiOperation("排序")
+    public Object sort(
+            @OpenApiModel(description = "数据")
+            @RequestBody
+                    DataSortDTO<String> data)
+            throws
+            ServiceException {
+            ${businessName_lower}Service.sort(data);
+        return ApiResultData.success();
+    }
+
+    /**
+     * 拖动排序
+     *
+     * @param data 数据
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:drag-sort')")
+    @PostMapping("/drag-sort")
+    @ApiOperation("拖动排序")
+    public Object dragSort(
+            @OpenApiModel(description = "数据")
+            @RequestBody
+#if($tree)
+            TreeDragSortDTO<String> data)
+#else
+            DragSortDTO<String> data)
+#end
+            throws
+            ServiceException {
+            ${businessName_lower}Service.dragSort(data);
+        return ApiResultData.success();
+    }
+#end
+#if($enable)
+
+    /**
+     * 启用/禁用
+     *
+     * @param id     主键
+     * @param enable true：启用，false：禁用
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:enable')")
+    @GetMapping(value = "/enable/{id}/{enable}",
+                consumes = "*/*")
+    @ApiOperation("启用/禁用")
+    public Object enable(
+            @Parameter(name = "id",
+                       description = "主键")
+            @PathVariable("id")
+                    String id,
+            @Parameter(name = "enable",
+                       description = "true：启用，false：禁用")
+            @PathVariable("enable")
+                    Boolean enable)
+            throws
+            ServiceException {
+            ${businessName_lower}Service.enable(id,
+                                               enable);
+        return ApiResultData.success();
+    }
+#end
+#if($lock)
+
+    /**
+     * 锁定/解锁
+     *
+     * @param id     主键
+     * @param locked true：锁定，false：解锁
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:lock')")
+    @GetMapping(value = "/lock/{id}/{locked}",
+                consumes = "*/*")
+    @ApiOperation("锁定/解锁")
+    public Object lock(
+            @Parameter(name = "id",
+                       description = "主键")
+            @PathVariable("id")
+                    String id,
+            @Parameter(name = "enable",
+                       description = "true：锁定，false：解锁")
+            @PathVariable("locked")
+                    Boolean locked)
+            throws
+            ServiceException {
+            ${businessName_lower}Service.lock(id,
+                                              locked);
+        return ApiResultData.success();
+    }
+#end
+#if($import)
+
+    /**
+     * 导入数据
+     *
+     * @param personalFileId 上传Excel文件后获取的个人文件信息Id
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:import')" )
+    @PostMapping("/import/{personalFileId}" )
+    @ApiOperation("导入数据" )
+    public Object import_(
+            @Parameter(name = "personalFileId" ,
+                       description = "上传Excel文件后获取的个人文件信息Id" )
+            @PathVariable("personalFileId" )
+                    String personalFileId)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.import_(personalFileId);
+        return ApiResultData.success();
+    }
+#end
+#if($export)
+    #if($tree)
+
+    /**
+     * 导出数据
+     *
+     * @param version            版本（xls, xlsx）
+     * @param treeDataSearchJson 树状列表搜索参数Json字符串
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:export')")
+    @GetMapping(value = "/export/{version}",
+                consumes = "*/*")
+    @ApiOperation(value = "导出数据",
+                  notes = "输出文件流",
+                  consumes = "*/*",
+                  response = Object.class)
+    public void export(
+            @Parameter(name = "version",
+                       description = "版本（xls, xlsx）")
+            @PathVariable("version")
+                    ExcelVersion version,
+            @Parameter(name = "treeDataSearchJson",
+                       description = "树状列表搜索参数Json字符串")
+            @RequestParam(value = "treeDataSearchJson",
+                          required = false)
+                    String treeDataSearchJson)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.export(version,
+                               treeDataSearchJson);
+    }
+    #else
+
+    /**
+     * 导出数据
+     *
+     * @param version        版本（xls, xlsx）
+     * @param dataSearchJson 搜索参数Json字符串
+     */
+    @PreAuthorize("@aph.isPass('${authValue}:export')")
+    @GetMapping(value = "/export/{version}",
+                consumes = "*/*")
+    @ApiOperation(value = "导出数据",
+                  notes = "输出文件流",
+                  consumes = "*/*",
+                  response = Object.class)
+    public void export(
+            @Parameter(name = "version",
+                       description = "版本（xls, xlsx）")
+            @PathVariable("version")
+                    ExcelVersion version,
+            @Parameter(name = "dataSearchJson",
+                       description = "搜索参数Json字符串")
+            @RequestParam(value = "dataSearchJson",
+                          required = false)
+                    String dataSearchJson)
+            throws
+            ServiceException {
+        ${businessName_lower}Service.export(version,
+                               dataSearchJson);
+    }
+    #end
+#end
+#foreach($constEnum in $constEnumList)
+    #if($constEnum.type == "常量")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}集合
+     */
+    @GetMapping(value = "/${constEnum.name}-list",
+                consumes = "*/*")
+    @OpenApiAllowAnonymous
+    @ApiOperation("获取所有${constEnum.explain}")
+    @OpenApiModel(type = java.util.List.class,
+                  genericTypes = {
+                          @OpenApiGenericType(arguments = {@OpenApiGenericTypeArgument(String.class)})},
+                  description = "${constEnum.explain}")
+    public Object ${constEnum.name}List()
+            throws
+            ServiceException {
+        return ApiResultData.success(${businessName_lower}Service.${constEnum.name}List());
+    }
+    #elseif($constEnum.type == "枚举")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}键值对集合
+     */
+    @GetMapping(value = "/${constEnum.name}-map",
+                consumes = "*/*")
+    @OpenApiAllowAnonymous
+    @ApiOperation("获取所有${constEnum.explain}")
+    @OpenApiModel(type = java.util.Map.class,
+                  genericTypes = {
+                          @OpenApiGenericType(arguments = {@OpenApiGenericTypeArgument(String.class),
+                                                           @OpenApiGenericTypeArgument(String.class)})},
+                  description = "${constEnum.explain}键值对集合")
+    public Object ${constEnum.name}Map()
+            throws
+            ServiceException {
+        return ApiResultData.success(${businessName_lower}Service.${constEnum.name}Map());
+    }
+    #end
+#end
+}

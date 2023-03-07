@@ -1,0 +1,171 @@
+# 开发环境配置
+server:
+  # 服务器的HTTP端口，默认为8080
+  port: 8080
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+    # 连接数满后的排队数，默认为100
+    accept-count: 1000
+    threads:
+      # tomcat最大线程数，默认为200
+      max: 800
+      # Tomcat启动初始化的线程数，默认值10
+      min-spare: 100
+
+# 日志配置
+logging:
+  level:
+    top.lctr.naive.file.system: warn
+    org.springframework: warn
+
+# Spring配置
+spring:
+  profiles:
+    active: @env@-@os@
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 20
+      minIdle: 2
+      webStatFilter:
+        enabled: false
+      statViewServlet:
+        enabled: false
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username: admin
+        login-password: 123456
+      filter:
+        stat:
+          enabled: false
+          # 慢SQL记录
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+  # json配置
+  jackson:
+    mapper:
+      # 接口反序列化参数时大小写不敏感
+      accept-case-insensitive-properties: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  # 资源信息
+  messages:
+    # 国际化资源文件路径
+    basename: i18n/strings
+
+#服务配置
+service:
+  #服务标识
+  key: 00000000-0000-0000-0000-000000000001
+  #服务名称
+  name: Java代码自动生成服务系统
+  #版本号
+  version: 1.0.0
+  #启用swagger
+  enableSwagger: false
+  #站点资源文件根目录相对路径
+  wwwRootDirectory: wwwroot
+
+#项目拓展
+project:
+  extension:
+    mybatis:
+      # 默认的数据源
+      dataSource: master
+      # mybatis配置文件路径
+      configLocation: classpath:mybatis/mybatis-config.xml
+      # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
+      scanEntitiesPackages: top.lctr.naive.file.system.entity.**
+      # 需要扫描的存放Mapper接口类的包（可选）
+#      scanMapperPackages: project.extension.mybatis.edge.mapper.**
+      # 需要扫描的存放Mapper配置类的包
+#      scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
+      # 默认的实体类表明/列名命名规则
+      nameConvertType: CamelCaseToPascalCase
+      # 多数据源配置
+      multiDataSource:
+        #主库
+        master:
+          enable: true
+          dbType: JdbcMariaDB10
+          nameConvertType: PascalCaseToUnderscoreWithLower
+          properties:
+            # 连接字符串
+            url: ENC(SSpORgVScIribVtil+Lmmcdd4bU7/X9kcI1/N48uo0V/slXQ9lBWfy6PxET0D0iDf7duz9UzIcB4SltcbYD6tehPCMpMwxBNFwgzAiD/EjIBryYib60rCUoP3qiPF1N9EhpjGjn/yXkzwAVdvAyPwmkOseNYAsL7XfLrycE+waGWyOg2WL3Sr2wmipJ0v9DezypCE2+j3rphrOoNiAfNa7EsZKJ9Fb4YgxeXSYFwMQlZKuI+OFcccb2Ug/QjIGFV)
+            # 用户名
+            username: ENC(LWfGadRuyaYT3ZIEFoEs/w==)
+            # 密码
+            password: ENC(Q88XTJSttazzBLg5bVN32Oyn0e5CagP/+MXtmSUYGxc=)
+
+#文件服务配置
+file:
+  #图片默认预览宽度
+  previewWidth: 200
+  #图片默认预览高度
+  previewHeight: 200
+  #大文件上传模块
+  upload-large-file:
+    #启用
+    enable: true
+    #线程池大小
+    threadPoolSize: 1
+    #定时检查未完成的任务的时间间隔(m)
+    checkInterval: 10
+    #定时清理分片文件的时间间隔(h)
+    clearInterval: 1
+    #集线器
+    hubConfig:
+      enable: true
+      #消息处理线程池大小
+      handlerThreadPoolSize: -1
+      #消息发送线程池大小
+      senderThreadPoolSize: -1
+  #文件修复
+  repair:
+    #启用
+    enable: true
+    #线程池大小
+    threadPoolSize: 1
+    #定时检查待修复的文件的时间间隔(h)
+    checkInterval: 6
+    #集线器
+    hubConfig:
+      enable: true
+      #消息处理线程池大小
+      handlerThreadPoolSize: -1
+      #消息发送线程池大小
+      senderThreadPoolSize: -1
+  #Word文件自动转换为Pdf文件
+  word2pdf:
+    #启用
+    enable: true
+    #线程池大小
+    threadPoolSize: 1
+    #定时检查待转换的文件的时间间隔(h)
+    checkInterval: 24
+    #集线器
+    hubConfig:
+      enable: true
+      #消息处理线程池大小
+      handlerThreadPoolSize: -1
+      #消息发送线程池大小
+      senderThreadPoolSize: -1
+
+jasypt:
+  encryptor:
+    password: ${JAVA_LCTR_TEST_JASYPT_PASSWORD}
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

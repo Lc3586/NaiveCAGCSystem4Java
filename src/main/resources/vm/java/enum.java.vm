@@ -1,0 +1,98 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* _______________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.dto.${table.moduleName};
+
+/**
+#if($description)
+ * ${description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+public enum ${name} {
+#foreach($value in $values)
+
+    /**
+    #if($value.description)
+     * ${value.description}
+    #end
+     */
+    @OpenApiDescription("${value.description}")
+    ${value.key}(value.index, "${value.key}")#if($value.last);#else,#end
+#end
+
+    /**
+     * @param index 索引
+     * @param value 值
+     */
+    ${name}(int index, String value) {
+        this.index = index;
+        this.value = value;
+    }
+
+    /**
+     * 索引
+     */
+    int index;
+
+    /**
+     * 值
+     */
+    String value;
+
+    /**
+     * 获取索引
+     *
+     * @return 索引
+     */
+    public int getIndex() {
+        return this.index;
+    }
+
+    /**
+     * 获取字符串
+     *
+     * @return 值
+     */
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    /**
+     * 获取枚举
+     *
+     * @param value 值
+     * @return 枚举
+     */
+    public static ${name} toEnum(String value) throws IllegalArgumentException {
+        return ${name}.valueOf(value);
+    }
+
+    /**
+     * 获取枚举
+     *
+     * @param index 索引
+     * @return 枚举
+     */
+    public static ${name} toEnum(int index) throws IllegalArgumentException {
+        for (${name} value : ${name}.values()) {
+            if (value.getIndex() == index)
+                return value;
+        }
+
+        throw new IllegalArgumentException(String.format("指定索引%s无效", index));
+    }
+}

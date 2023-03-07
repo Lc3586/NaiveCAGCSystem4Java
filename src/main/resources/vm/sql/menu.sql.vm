@@ -1,0 +1,59 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+/**
+ * ${table.title}添加菜单
+ * ${table.description}
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+
+DECLARE
+    hasModuleMenu BIT;
+    moduleMenuId BIGINT;
+    moduleMenuOrder INT;
+    businessMenuId BIGINT;
+    businessMenuOrder INT;
+BEGIN
+    -- 模块菜单是否已存在
+    SELECT COUNT(1) INTO hasModuleMenu FROM sys_menu WHERE path = '${table.moduleName}' AND menu_type = 'M';
+
+    IF(hasModuleMenu) THEN
+        SELECT menu_id INTO moduleMenuId FROM sys_menu WHERE path = '${table.moduleName}' AND menu_type = 'M';
+    ELSE
+        -- 模块菜单排序值
+        SELECT MAX(order_num) + 1 INTO moduleMenuOrder FROM sys_menu WHERE menu_type = 'M';
+
+        -- 添加模块菜单
+        INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, name, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+        VALUES(${moduleMenuId}, '${table.moduleName}', 0, moduleMenuOrder, '${table.moduleName}', '${table.moduleName}', '', 1, 0, 'M', '0', '0', '', '#', '${trim_currentOpName}', sysdate(), '', NULL, '');
+
+        SELECT ${moduleMenuId} INTO moduleMenuId;
+    END if;
+
+    -- 业务菜单排序值
+    SELECT MAX(order_num) + 1 INTO businessMenuOrder FROM sys_menu WHERE parent_id = moduleMenuId AND menu_type = 'C';
+
+    -- 业务菜单
+    INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, name, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+    VALUES(${businessMenuId}, '${table.title}管理', moduleMenuId, businessMenuOrder, '${table.moduleName}${table.businessName}Index', '${table.businessName}', '${table.moduleName}/${businessName_lower}/index', 1, 0, 'C', '0', '0', '', '#', '${trim_currentOpName}', sysdate(), '', NULL, '');
+
+    -- 功能菜单
+#foreach($fun in $menuFuns)
+    INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, name, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+    VALUES(${fun.menuId}, '${fun.title}', ${businessMenuId}, '${fun.order}', '${table.moduleName}${table.businessName}${fun.name}', '${routePath}${fun.path}', '', 1, 0, 'F', '0', '0', '${authValue}${fun.authValue}', '#', '${trim_currentOpName}', sysdate(), '', NULL, '');
+
+#end
+END;
+

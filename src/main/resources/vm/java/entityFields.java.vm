@@ -1,0 +1,37 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.entity.entityFields.${table.moduleName};
+
+/**
+ * ${table.title}实体字段
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ * @see ${packageName}.entity.domain.${table.moduleName}.${entityName}
+ */
+public final class ${initialsName}_Fields {
+#foreach($field in $fields)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+    */
+    public static final String ${field.name} = "${field.name}";
+
+#end
+}

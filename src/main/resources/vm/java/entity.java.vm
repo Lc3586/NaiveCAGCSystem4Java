@@ -1,0 +1,101 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.entity.domain.${table.moduleName};
+
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import project.extension.mybatis.annotations.ColumnSetting;
+import project.extension.mybatis.annotations.TableSetting;
+import project.extension.openapi.annotations.OpenApiDescription;
+import project.extension.openapi.annotations.OpenApiIgnore;
+import project.extension.openapi.annotations.OpenApiSubTag;
+
+#if($hasBigDecimal)
+import java.math.BigDecimal;
+#end
+import java.util.Date;
+
+/**
+ * ${table.title}实体类
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+@TableSetting
+@JSONType(ignores = "serialVersionUID")
+public class ${entityName} {
+    @ColumnSetting(ignore = true)
+    @OpenApiIgnore
+    @JsonIgnore
+    private static final long serialVersionUID = 1L;
+#foreach($field in $fields)
+
+    /**
+    * ${field.title}
+    #if($field.description)
+    * ${field.description}
+    #end
+    #if($field.contEnumLink)
+    * ${field.contEnumLink}
+    #end
+    */
+    #foreach($annotation in $field.annotations)
+    ${annotation}
+    #end
+    private ${field.javaType} ${field.name};
+#end
+#foreach($field in $fields)
+
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public void set${field.name4Method}(${field.javaType} ${field.name}){
+        this.${field.name} = ${field.name};
+    }
+
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public ${field.javaType} get${field.name4Method}(){
+        return this.${field.name};
+    }
+#end
+
+    /**
+    * 格式化为字符串
+    */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,
+                                   ToStringStyle.MULTI_LINE_STYLE)
+#foreach($field in $fields)
+                .append("${field.name}",
+                        get${field.name4Method}())
+#end
+            .toString();
+    }
+}

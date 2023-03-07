@@ -1,0 +1,515 @@
+<!--
+
+/**\_________________________________________________________________________________________________
+|*												说明											                                               ___≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*    此代码由VM模板自动生成			  														                                    |
+|*		版本:v0.0.0.1                                                                              |___
+|*		日期:${dateTime}                                                                      ≣|
+|*																	                              create by    LCTR                ≣|
+|*																	                              generate by  ${currentOpName}  ≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+#set($doller = '$')
+${table.title}管理页
+#if($table.description)
+${table.description}
+#end
+
+author ${table.signature}
+date ${date}
+
+-->
+<template>
+  <div class="app-container">
+    <tr-table :requestApi="${table.businessName}Service.list"
+              #if($tree)
+              table-type="tree"
+              #end
+              #if($sort)
+              order="${sortCode}"
+              #else
+              order="createTime"
+              #end
+              ref="trTableRef"
+              :custom-search="customSearch"
+              :columns="columns">
+
+      <!-- 表格 header 按钮 -->
+      <template #tableHeader="scope">
+        <el-button type="primary"
+                   :icon="CirclePlus"
+                   @click="openDrawer('新增')">
+          新增
+        </el-button>
+        <el-button type="danger"
+                   :icon="Delete"
+                   plain
+                   :disabled="!scope.isSelected"
+                   @click="batchDelete(scope.ids)">
+          批量删除
+        </el-button>
+#if($import)
+        <el-button type="success"
+                   :icon="Upload">
+          导入
+        </el-button>
+#end
+#if($export)
+        <el-button type="success"
+                   :icon="Download"
+                   @click="handlerExport">
+          导出
+        </el-button>
+#end
+      </template>
+
+      <!-- 特殊插槽-->
+      <!-- 插槽名称需要与columns的props对应-->
+      <!-- 如果插槽的值为 el-switch，第一次加载会默认触发 switch 的 @change 方法，所有在外层包一个盒子，点击触发盒子 click 方法 -->
+      #if($enable)
+      <template #${enableCode}="scope">
+        <div @click="enableChanging(scope.row)">
+          <el-switch :value="scope.row.${enableCode}"
+                     :loading="renderData.enableLoading"/>
+        </div>
+      </template>
+
+      #end
+      #if($lock)
+      <template #${lockCode}="scope">
+        <div @click="lockChanging(scope.row)">
+          <el-switch :value="scope.row.${lockCode}"
+                     :loading="renderData.lockLoading"/>
+        </div>
+      </template>
+
+      #end
+
+      #if($sort)
+      <template #sort="scope">
+        <el-button type="info"
+                   link
+                   :icon="Bottom"
+                   title="置底"
+                   @click="sort(scope.row.id, SortMethod.置底)"
+                   :loading="renderData.sortLoading"/>
+
+        <el-button type="success"
+                   link
+                   :icon="SortDown"
+                   title="下移"
+                   @click="sort(scope.row.id, SortMethod.下移)"
+                   :loading="renderData.sortLoading"/>
+
+        <el-button type="primary"
+                   link
+                   :icon="SortUp"
+                   title="上移"
+                   @click="sort(scope.row.id, SortMethod.上移)"
+                   :loading="renderData.sortLoading"/>
+
+        <el-button type="info"
+                   link
+                   :icon="Top"
+                   title="置顶"
+                   @click="sort(scope.row.id, SortMethod.置顶)"
+                   :loading="renderData.sortLoading"/>
+      </template>
+
+      #end
+
+      <!-- 表格操作 -->
+      <template #operation="scope">
+        <el-button type="info"
+                   link
+                   :icon="Document"
+                   @click="openDrawer('详情', scope.row)">
+          详情
+        </el-button>
+        <el-button type="warning"
+                   link
+                   :icon="EditPen"
+                   @click="openDrawer('编辑', scope.row)">
+          编辑
+        </el-button>
+        <el-button type="danger"
+                   link
+                   :icon="Delete"
+                   @click="delete_(scope.row)">
+          删除
+        </el-button>
+      </template>
+      <!-- 表格操作 END-->
+      <!-- 特殊插槽 END-->
+    </tr-table>
+    <tr-dialog v-model:visible="dialogParam.visible"
+               :showBtn="dialogParam.showBtn"
+               :showSubmit="dialogParam.showSubmit"
+               :title="dialogParam.title"
+               :width="dialogParam.width">
+      <div class="dialog-body pretty-scrollbar">
+        <${businessName_componentName}-add v-if="dialogParam.type === '新增'"
+                   @close="dialogParam.visible = false"
+                   @submitted="updateTable"/>
+        <${businessName_componentName}-edit v-if="dialogParam.type === '编辑'"
+                    :id="renderData.selectDataId"
+                    @close="dialogParam.visible = false"
+                    @submitted="updateTable"/>
+        <${businessName_componentName}-details v-if="dialogParam.type === '详情'"
+                       :id="renderData.selectDataId"/>
+      </div>
+  </tr-dialog>
+  </div>
+</template>
+<script lang="ts" name="${table.moduleName}${table.businessName}Index" setup>
+//美化滚动条样式
+import '@/components/PrettyScrollbar/index.css';
+import ${table.businessName}Service from '@/api/service/${table.moduleName}/${table.businessName}Service';
+import {${initialsName}_Fields} from "@/api/dto/${table.moduleName}/${businessName_lower}/${initialsName}_Fields";
+import ${table.businessName}Add from './add.vue';
+import ${table.businessName}Details from './details.vue';
+import ${table.businessName}Edit from './edit.vue';
+import {
+  CirclePlus,
+  Delete,
+  EditPen,
+  Document,
+#if($import)
+  Upload,
+#end
+#if($export)
+  Download,
+#end
+#if($sort)
+  SortUp,
+  SortDown,
+  Top,
+  Bottom,
+#end
+} from '@element-plus/icons-vue';
+import {FilterCompare} from "@/api/model/utils/FilterCompare";
+import {getCurrentInstance, reactive, ref, toRefs} from "vue";
+import DialogParam from "@/api/model/utils/DialogParam";
+import {ColumnProps} from "@/components/TrTable/interface";
+import {ElMessage, ElMessageBox} from "element-plus";
+#if($sort)
+import {SortMethod} from "@/api/model/utils/SortMethod";
+import DataSortDTO from "@/api/dto/utils/request/DataSortDTO";
+#end
+
+
+// 获取vue实例
+const {proxy} = getCurrentInstance();
+// 获取 trTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
+const trTableRef = ref();
+
+/**
+ * 渲染数据
+ */
+let renderData = reactive({
+  /**
+   * 数据列
+   */
+  columns: [
+    {
+      type: 'index',
+      label: '序号',
+      width: 56
+    },
+    {
+      type: 'selection',
+      label: '',
+      width: 56
+    },
+#foreach($field in $fields)
+    #if($field.hasSplit)
+    {
+      label: '${field.title}',
+      prop: ${initialsName}_Fields.${field.name}List,
+      width: 260,
+      tag: true,
+      tagType: 'tagList',
+        #if($field.query)
+      compare: FilterCompare.${field.queryCompare},
+      search: true,
+        #end
+    },
+    #else
+    {
+      label: '${field.title}',
+      prop: ${initialsName}_Fields.${field.name},
+      width: 80,
+        #if($field.enable)
+      enum: [
+        {
+          label: '启用',
+          value: true
+        },
+        {
+          label: '禁用',
+          value: false
+        }
+      ],
+      searchType: "select",
+      showOverflowTooltip: false,
+        #end
+        #if($field.lock)
+      enum: [
+        {
+          label: '锁定',
+          value: true
+        },
+        {
+          label: '解锁',
+          value: false
+        }
+      ],
+      searchType: "select",
+      showOverflowTooltip: false,
+        #end
+        #if($field.query)
+      search: true,
+      searchWidth: 100,
+      compare: FilterCompare.${field.queryCompare},
+        #end
+        #if($field.sort)
+      sortable: true,
+        #end
+    },
+    #end
+#end
+    {
+      prop: "operation",
+      label: "操作",
+      width: 250,
+      fixed: "right"
+    }
+  ] as Partial<ColumnProps>[],
+
+  /**
+   * 当前数据行的Id
+   */
+  selectDataId: null as string,
+
+  /**
+   * 对话框参数
+   */
+  dialogParam: new DialogParam(),
+  #if($enable)
+
+  /**
+   * 启用/禁用操作状态
+   */
+  enableLoading: false,
+  #end
+  #if($lock)
+
+  /**
+   * 锁定/解锁操作状态
+   */
+  lockLoading: false,
+  #end
+  #if($sort)
+
+  /**
+   * 排序操作状态
+   */
+  sortLoading: false,
+  #end
+});
+
+/**
+ * 单独解构的属性
+ */
+const {columns, dialogParam} = toRefs(renderData);
+
+/**
+ * 更新数据表
+ */
+const updateTable = () => {
+  trTableRef.value.refresh();
+}
+#if($enable)
+
+/**
+ * 启用/禁用
+ *
+ * @param id 主键
+ * @param ${enableCode} 当前状态
+ */
+const enableChanging = async ({id, ${enableCode}}) => {
+  try {
+    renderData.enableLoading = true;
+    await ${table.businessName}Service.enable(id, !${enableCode});
+    updateTable();
+    renderData.enableLoading = false;
+  } catch (ex) {
+    renderData.enableLoading = false;
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message,
+    });
+  }
+}
+#end
+#if($lock)
+
+/**
+ * 锁定/解锁
+ *
+ * @param id 主键
+ * @param ${lockCode} 当前状态
+ */
+const lockChanging = async ({id, ${lockCode}}) => {
+  try {
+    renderData.lockLoading = true;
+    await ${table.businessName}Service.lock(id, !${lockCode});
+    updateTable();
+    renderData.lockLoading = false;
+  } catch (ex) {
+    renderData.lockLoading = false;
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message,
+    });
+  }
+}
+#end
+#if($sort)
+
+/**
+ * 排序
+ *
+ * @param id 主键
+ * @param method 排序方法
+ */
+const sort = async (id: string, method: SortMethod) => {
+  try {
+    renderData.sortLoading = true;
+    await ${table.businessName}Service.sort(new DataSortDTO<string>(id, method, 1));
+    updateTable();
+    renderData.sortLoading = false;
+  } catch (ex) {
+    renderData.sortLoading = false;
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message,
+    });
+  }
+}
+#end
+
+/**
+ * 操作
+ *
+ * @param type 类型
+ * @param row  数据行
+ */
+const openDrawer = async (type: string, row?: any) => {
+  switch (type) {
+    case '详情':
+      renderData.dialogParam.showBtn = true;
+      renderData.dialogParam.showSubmit = false;
+      renderData.selectDataId = row.id;
+      break;
+    case '新增':
+      renderData.dialogParam.showBtn = false;
+      break;
+    case '编辑':
+      renderData.dialogParam.showBtn = false;
+      renderData.selectDataId = row.id;
+      break;
+  }
+
+  renderData.dialogParam.width = "30%";
+  renderData.dialogParam.visible = true;
+  renderData.dialogParam.title = type;
+  renderData.dialogParam.type = type;
+}
+
+/**
+ * 单个删除
+ *
+ * @param id id
+ */
+const delete_ = ({id}) => {
+  handlerDelete([id]);
+};
+
+/**
+ * 批量删除
+ *
+ * @param ids id集合
+ */
+const batchDelete = (ids: string[]) => {
+  handlerDelete(ids);
+};
+
+/**
+ * 处理删除操作
+ *
+ * @param ids id集合
+ */
+const handlerDelete = (ids: string[]) => {
+  if (ids.length === 0) {
+    ElMessage({
+      type: 'error',
+      message: '请先选择数据'
+    });
+    return;
+  }
+
+  ElMessageBox.confirm(`确定要删除这${doller}{ids.length}条数据吗？`, '系统警告', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      const msg = await ${table.businessName}Service.delete_(ids);
+      ElMessage({
+        type: 'success',
+        message: msg
+      });
+      updateTable();
+    } catch (ex) {
+      console.error(ex);
+      ElMessage({
+        type: 'error',
+        message: ex.message,
+      });
+    }
+  }).catch((ex) => {
+    console.error(ex);
+  });
+};
+#if($export)
+
+/**
+ * 处理导出操作
+ */
+const handlerExport = () => {
+  ${table.businessName}Service.export_(null, trTableRef.value.filtersParams);
+};
+#end
+
+/**
+ * 初始化方法
+ */
+(async () => {
+
+})();
+</script>
+
+<style scoped>
+.dialog-body {
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 10px;
+}
+</style>

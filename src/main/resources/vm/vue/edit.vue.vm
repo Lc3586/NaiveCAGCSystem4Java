@@ -1,0 +1,276 @@
+<!--
+
+/**\_________________________________________________________________________________________________
+|*												说明											                                               ___≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*    此代码由VM模板自动生成		  															                                    |
+|*		版本:v0.0.0.1                                                                              |___
+|*		日期:${dateTime}                                                                      ≣|
+|*																	                              create by    LCTR                ≣|
+|*																	                              generate by  ${currentOpName}  ≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+${table.title}编辑页
+#if($table.description)
+${table.description}
+#end
+
+author ${table.signature}
+date ${date}
+
+-->
+<template>
+  <simple-skeleton :loading="renderData.loading"/>
+
+  <div v-if="!renderData.loading"
+       class="form-container pretty-scrollbar">
+
+    <el-form v-if="!renderData.loading"
+             ref="formRef"
+             :model="data"
+             :rules="rules"
+             label-width="80px">
+#foreach($field in $fields)
+    #if($field.hasSplit)
+
+      <el-form-item label="${field.title}"
+                    :prop="${initialsName}_Fields.${field.name}List">
+        <simple-tag-list v-model="data.${field.name}List"
+                  name="${field.title}"
+                  :type="DataType.字符串"
+                  @change="update_${field.name}List">
+        </simple-tag-list>
+      </el-form-item>
+    #else
+
+      <el-form-item label="${field.title}"
+                    :prop="${initialsName}_Fields.${field.name}">
+       #if($field.enable)
+        <el-switch v-model="data.${field.name}"
+                   active-text="启用"
+                   inactive-text="禁用"/>
+       #elseif($field.lock)
+        <el-switch v-model="data.${field.name}"
+                   active-text="锁定"
+                   inactive-text="解锁"/>
+       #elseif($field.tsType == 'boolean')
+        <el-switch v-model="data.${field.name}"
+                   active-text="是"
+                   inactive-text="否"
+                   inline-prompt/>
+       #elseif($field.longText)
+        <el-input v-model="data.${field.name}"
+                  placeholder="请输入${field.title}"
+                  type="textarea"
+                  :autosize="{ minRows: 2 }"
+                  clearable/>
+       #else
+        <el-input v-model="data.${field.name}"
+                  placeholder="请输入${field.title}"
+                  clearable/>
+       #end
+      </el-form-item>
+   #end
+#end
+    </el-form>
+  </div>
+
+  <div class="dialog-footer">
+    <el-button @click="emit('close', data)">
+      关闭
+    </el-button>
+    <el-button v-if="!renderData.loading"
+               type="primary"
+               @click="submitAsync"
+               :loading="renderData.processing">
+      提交
+    </el-button>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {Edit} from "@/api/dto/${table.moduleName}/${businessName_lower}/Edit";
+import {${initialsName}_Fields} from "@/api/dto/${table.moduleName}/${businessName_lower}/${initialsName}_Fields";
+import ${table.businessName}Service from '@/api/service/${table.moduleName}/${table.businessName}Service';
+import type {FormInstance} from 'element-plus';
+import {reactive, ref, toRefs} from "vue";
+import {ElMessage} from "element-plus";
+import SimpleSkeleton from '@/components/SimpleSkeleton/index.vue';
+import SimpleTagList from '@/components/SimpleTagList/index.vue';
+import {DataType} from '@/components/SimpleTagList/Model/DataType';
+
+
+/**
+ * 渲染数据
+ */
+let renderData = reactive({
+  /**
+   * 加载状态
+   */
+  loading: true,
+  /**
+   * 处理中
+   */
+  processing: false,
+  /**
+   * 数据
+   */
+  data: null as Edit,
+  /**
+   * 表单验证规则
+   */
+  rules: {
+#foreach($field in $fields)
+    ${field.name}: [
+ #if($field.required)
+      {
+        required: true,
+        message: '请输入${field.title}',
+        trigger: 'blur'
+      },
+ #elseif($field.maxLength>0)
+      {
+        max: ${field.maxLength},
+        message: '长度不可超过${field.maxLength}',
+        trigger: 'blur'
+      }
+ #else
+
+ #end
+    ],
+#end
+  }
+});
+
+/**
+ * 单独解构的属性
+ */
+const {data, rules} = toRefs(renderData);
+
+/**
+ * 获取表单实例
+ */
+const formRef = ref<FormInstance>();
+
+/**
+ * 组件属性
+ */
+const props = withDefaults(defineProps<{
+  /**
+   * 数据Id
+   */
+  id: string
+}>(), {
+  id: ''
+});
+
+/**
+ * 组件自定义事件
+ */
+const emit = defineEmits<{
+  /**
+   * 数据已提交
+   *
+   * @param e
+   * @param data 数据
+   */
+  (e: 'submitted', data: Edit): void,
+
+  /**
+   * 关闭窗口
+   *
+   * @param e
+   * @param data 数据
+   */
+  (e: 'close', data: Edit): void
+}>();
+#foreach($field in $fields)
+ #if($field.hasSplit)
+
+/**
+ * 更新${field.title}集合
+ *
+ * @param list 数据集合
+ */
+const update_${field.name}List = (list: unknown[]) => {
+  renderData.data.${field.name}List = list as string[];
+};
+ #end
+#end
+
+/**
+ * 表单验证
+ */
+const validate = async (): Promise<void> => {
+  try {
+    await formRef.value.validate();
+  } catch (ex) {
+    console.error(ex);
+    throw new Error('请检查数据');
+  }
+}
+
+/**
+ * 表单提交
+ *
+ * @return 是否成功
+ */
+const submitAsync = async (): Promise<void> => {
+  try {
+    renderData.processing = true;
+    // 表单验证
+    await validate();
+
+    // 提交数据
+    const msg: string = await ${table.businessName}Service.edit(renderData.data);
+    emit('submitted', renderData.data);
+    ElMessage({
+      type: 'success',
+      message: msg
+    });
+    renderData.processing = false;
+  } catch (ex) {
+    renderData.processing = false;
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message
+    });
+  }
+}
+
+/**
+ * 初始化方法
+ */
+(async () => {
+  if (!props.id) {
+    ElMessage({
+      type: 'warning',
+      message: '操作有误'
+    });
+    return;
+  }
+
+  //写入数据
+  try {
+    renderData.data = await ${table.businessName}Service.getEditData(props.id);
+    renderData.loading = false;
+  } catch (ex) {
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message
+    });
+  }
+})();
+</script>
+
+<style scoped>
+.form-container {
+  max-height: 500px;
+  padding: 10px;
+  overflow: auto;
+}
+</style>

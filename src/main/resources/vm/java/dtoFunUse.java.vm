@@ -1,0 +1,60 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.dto.${table.moduleName}.${businessName_lower}DTO;
+
+import ${packageName}.entity.domain.${table.moduleName}.${entityName};
+import project.extension.mybatis.annotations.EntityMapping;
+
+/**
+ * ${table.title}业务模型
+ * <p>${name}方法</p>
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+@EntityMapping(${entityName}.class)
+public class FunUse_${name} {
+#foreach($field in $fields)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    private ${field.javaType} ${field.name};
+
+#end
+#foreach($field in $fields)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public void set${field.name4Method}(${field.javaType} ${field.name}){
+        this.${field.name} = ${field.name};
+    }
+
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public ${field.javaType} get${field.name4Method}(){
+        return this.${field.name};
+    }
+
+#end
+}

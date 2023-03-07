@@ -1,0 +1,127 @@
+<!--
+
+/**\_________________________________________________________________________________________________
+|*												说明											                                               ___≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*    此代码由VM模板自动生成		  															                                    |
+|*		版本:v0.0.0.1                                                                              |___
+|*		日期:${dateTime}                                                                      ≣|
+|*																	                              create by    LCTR                ≣|
+|*																	                              generate by  ${currentOpName}  ≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+${table.title}详情页
+#if($table.description)
+${table.description}
+#end
+
+author ${table.signature}
+date ${date}
+
+-->
+<template>
+  <simple-skeleton :loading="renderData.loading"/>
+
+  <el-form v-if="!renderData.loading">
+#foreach($field in $fields)
+ #if($field.hasSplit)
+
+    <el-form-item label="${field.title}："
+                  :prop="${initialsName}_Fields.${field.name}List">
+    <simple-tag-list v-model="data.${field.name}List"
+              name="${field.title}"
+              :type="DataType.字符串"
+              :readonly="true">
+    </simple-tag-list>
+    </el-form-item>
+ #else
+
+    <el-form-item label="${field.title}："
+                  :prop="${initialsName}_Fields.${field.name}">
+   #if($field.enable)
+      {{ data.${field.name} ? '启用' : '禁用' }}
+   #elseif($field.lock)
+      {{ data.${field.name} ? '锁定' : '解锁' }}
+   #elseif($field.tsType == 'boolean')
+       {{ data.${field.name} ? '是' : '否' }}
+   #else
+      {{ data.${field.name} }}
+   #end
+    </el-form-item>
+ #end
+#end
+  </el-form>
+</template>
+
+<script lang="ts" setup>
+import {Detail} from "@/api/dto/${table.moduleName}/${businessName_lower}/Detail";
+import {${initialsName}_Fields} from "@/api/dto/${table.moduleName}/${businessName_lower}/${initialsName}_Fields";
+import ${table.businessName}Service from '@/api/service/${table.moduleName}/${table.businessName}Service';
+import {reactive, toRefs} from "vue";
+import {ElMessage} from "element-plus";
+import SimpleTagList from '@/components/SimpleTagList/index.vue';
+import {DataType} from '@/components/SimpleTagList/Model/DataType';
+
+
+/**
+ * 渲染数据
+ */
+let renderData = reactive({
+  /**
+   * 加载状态
+   */
+  loading: true,
+  /**
+   * 数据
+   */
+  data: null as Detail
+});
+
+/**
+ * 单独解构的属性
+ */
+const {data} = toRefs(renderData);
+
+/**
+ * 组件属性
+ */
+const props = withDefaults(defineProps<{
+  /**
+   * 数据Id
+   */
+  id: string
+}>(), {
+  id: ''
+});
+
+/**
+ * 初始化方法
+ */
+(async () => {
+  if (!props.id) {
+    ElMessage({
+      type: 'warning',
+      message: '操作有误'
+    });
+    return;
+  }
+
+  //写入数据
+  try {
+    renderData.data = await ${table.businessName}Service.detail(props.id);
+    renderData.loading = false;
+  } catch (ex) {
+    console.error(ex);
+    ElMessage({
+      type: 'error',
+      message: ex.message
+    });
+  }
+})();
+</script>
+
+<style scoped>
+
+</style>

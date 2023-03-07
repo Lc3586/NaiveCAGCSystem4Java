@@ -1,0 +1,63 @@
+/*
+/*\_________________________________________________________________________________________________
+|*												说明											     __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	    |
+|*		版本:v0.0.0.1                                                                            |___
+|*		日期:${dateTime}                                                                    ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+**/
+
+
+/**
+ * ${table.title}业务模型
+ * <p>${dtoTag}</p>
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+export class ${dtoTag} {
+#if($tree)
+    /**
+     * 是否拥有子级
+     */
+    public hasChildren: boolean;
+
+    /**
+     * 子级数量
+     */
+    public childrenCount: number;
+
+    /**
+     * 子级
+     */
+    public children: ${dtoTag}[] = [];
+
+#end
+#foreach($field in $fields)
+    #if($field.hasSplit)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public ${field.name}List: string[] = [];
+
+    #else
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    public ${field.name}: ${field.tsType};
+
+    #end
+#end
+}

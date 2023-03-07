@@ -1,0 +1,161 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.dto.${table.moduleName}.${businessName_lower}DTO;
+
+import org.springframework.util.StringUtils;
+import project.extension.mybatis.annotations.EntityMappingSetting;
+import project.extension.openapi.annotations.OpenApiDescription;
+import project.extension.openapi.annotations.OpenApiMainTag;
+import project.extension.openapi.annotations.OpenApiMainTags;
+import ${packageName}.entity.domain.${table.moduleName}.${entityName};
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * ${table.title}业务模型
+ * <p>${dtoTag}</p>
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+@OpenApiMainTags({
+#foreach($mainTag in $mainTags)
+        ${mainTag}
+#end
+})
+public class ${dtoTag}
+        extends ${entityName} {
+#if($tree)
+
+    /**
+    * 是否拥有子级
+    */
+    @MappingSetting(ignore = true)
+    @OpenApiDescription("是否拥有子级")
+    private Boolean hasChildren;
+
+    /**
+     * 子级数量
+     */
+    @MappingSetting(ignore = true)
+    @OpenApiDescription("子级数量")
+    private Integer childrenCount;
+
+    /**
+     * 子级
+     */
+    @MappingSetting(ignore = true)
+    @OpenApiDescription("子级")
+    private java.util.List<List> children;
+
+    /**
+     * 是否拥有子级
+     */
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+
+    /**
+     * 是否拥有子级
+     */
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+     * 子级数量
+     */
+    public Integer getChildrenCount() {
+        return childrenCount;
+    }
+
+    /**
+     * 子级数量
+     */
+    public void setChildrenCount(Integer childrenCount) {
+        this.childrenCount = childrenCount;
+    }
+
+    /**
+     * 子级
+     */
+    public java.util.List<List> getChildren() {
+        return children;
+    }
+
+    /**
+     * 子级
+     */
+    public void setChildren(java.util.List<List> children) {
+        this.children = children;
+    }
+#end
+
+#foreach($field in $fields)
+    #if($field.hasSplit)
+
+    /**
+     * ${field.title}
+#if($field.description)
+     * ${field.description}
+#end
+     */
+    @EntityMappingSetting(ignore = true)
+    @OpenApiDescription("${field.title}")
+    private java.util.List<String> ${field.name}List;
+
+    /**
+     * ${field.title}
+#if($field.description)
+     * ${field.description}
+#end
+     */
+    public java.util.List<String> get${field.name4Method}List() {
+        return ${field.name}List;
+    }
+
+    /**
+     * ${field.title}
+#if($field.description)
+     * ${field.description}
+#end
+     */
+    public void set${field.name4Method}List(java.util.List<String> ${field.name}List) {
+        this.${field.name}List = ${field.name}List;
+        set${field.name4Method}(${field.name}List != null
+            ? String.join("${field.split}",
+                          ${field.name}List)
+            : null);
+    }
+
+    /**
+     * ${field.title}
+#if($field.description)
+     * ${field.description}
+#end
+     */
+    @Override
+    public void set${field.name4Method}(String ${field.name}) {
+        super.set${field.name4Method}(${field.name});
+        this.${field.name}List = StringUtils.hasText(${field.name})
+            ? Arrays.asList(${field.name}.split("${field.split}"))
+            : new ArrayList<>();
+    }
+    #end
+#end
+}

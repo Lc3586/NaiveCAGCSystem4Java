@@ -1,0 +1,34 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* _______________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.dto.${table.moduleName};
+
+/**
+#if($description)
+ * ${description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+public class ${name} {
+#foreach($value in $values)
+
+    /**
+    #if($value.description)
+     * ${value.description}
+    #end
+     */
+    public static final String ${value.key} = "${value.value}";
+#end
+}

@@ -1,0 +1,61 @@
+/*
+/*\_________________________________________________________________________________________________
+|*												说明											     __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	    |
+|*		版本:v0.0.0.1                                                                            |___
+|*		日期:${dateTime}                                                                    ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+**/
+
+
+/**
+ * ${table.title}模型字段集合
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+export const enum ${initialsName}_Fields {
+#if($tree)
+    /**
+     * 是否拥有子级
+     */
+    hasChildren = 'hasChildren',
+
+    /**
+     * 子级数量
+     */
+    childrenCount = 'childrenCount',
+
+    /**
+     * 子级
+     */
+    children = 'children',
+
+#end
+#foreach($field in $fields)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    ${field.name} = '${field.name}',
+
+    #if($field.hasSplit)
+    /**
+     * ${field.title}
+    #if($field.description)
+     * ${field.description}
+    #end
+     */
+    ${field.name}List = '${field.name}List',
+
+    #end
+#end
+}

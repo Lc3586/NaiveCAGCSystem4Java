@@ -1,0 +1,403 @@
+/*
+/*\_________________________________________________________________________________________________
+|*												说明											     __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	    |
+|*		版本:v0.0.0.1                                                                            |___
+|*		日期:${dateTime}                                                                    ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+**/
+
+
+#set($doller = '$')
+#if($tree)
+import TreeDataSearchDTO from "@/api/dto/utils/request/TreeDataSearchDTO";
+#else
+import DataSearchDTO from "@/api/dto/utils/request/DataSearchDTO";
+#end
+import request from "@/utils/request";
+import RuoyiApiResultDataDTO_T from "@/api/dto/utils/response/RuoyiApiResultDataDTO_T";
+import RuoyiApiResultDataDTO from "@/api/dto/utils/response/RuoyiApiResultDataDTO";
+import IApiData from "@/api/dto/utils/response/IApiData";
+import ApiDataSchemaExtension from "@/api/service/utils/ApiDataSchemaExtension";
+#if($export)
+import {getCookie} from "@/utils/cookie";
+import {ExcelVersion} from "@/api/model/utils/ExcelVersion";
+#end
+#if($sort)
+import DataSortDTO from "@/api/dto/utils/request/DataSortDTO";
+    #if($tree)
+import TreeDragSortDTO from "@/api/dto/utils/request/TreeDragSortDTO";
+    #else
+import DragSortDTO from "@/api/dto/utils/request/DragSortDTO";
+    #end
+#end
+import {List} from "@/api/dto/${table.moduleName}/${businessName_lower}/List";
+import {Edit} from "@/api/dto/${table.moduleName}/${businessName_lower}/Edit";
+import {Create} from "@/api/dto/${table.moduleName}/${businessName_lower}/Create";
+import {Detail} from "@/api/dto/${table.moduleName}/${businessName_lower}/Detail";
+
+/**
+ * ${table.title}服务
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+export default class ${table.businessName}Service {
+#if($tree)
+    /**
+     * 树状列表数据
+     *
+     * @param treeDataSearch 树状列表数据搜索参数
+     * @return 数据
+     */
+    public static async treeList(treeDataSearch: TreeDataSearchDTO): Promise<IApiData<List>> {
+        return new Promise<IApiData<List>>((resolve, reject) => {
+            request({
+                url: '${routePath}/tree-list',
+                method: 'post',
+                data: treeDataSearch
+            }).then((response: any) => {
+                resolve(ApiDataSchemaExtension.analysisResult(response as IApiData<List>, treeDataSearch.schema));
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取树状列表数据失败.'));
+            });
+        });
+    }
+#else
+    /**
+     * 列表数据
+     *
+     * @param dataSearch 数据搜索参数
+     * @return 数据
+     */
+    public static async list(dataSearch: DataSearchDTO): Promise<IApiData<List>> {
+        return new Promise<IApiData<List>>((resolve, reject) => {
+            request({
+                url: '${routePath}/list',
+                method: 'post',
+                data: dataSearch
+            }).then((response: any) => {
+                resolve(ApiDataSchemaExtension.analysisResult(response as IApiData<List>, dataSearch.schema));
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取列表数据失败.'));
+            });
+        });
+    }
+#end
+
+    /**
+     * 详情数据
+     *
+     * @param id 主键
+     * @return 详情数据
+     */
+    public static async detail(id: string): Promise<Detail> {
+        return new Promise<Detail>((resolve, reject) => {
+            request({
+                url: `${routePath}/detail/${doller}{id}`,
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO_T<Detail>).data);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取详情数据失败.'));
+            });
+        });
+    }
+
+    /**
+     * 新增
+     *
+     * @param data 数据
+     * @return 操作结果
+     */
+    public static async create(data: Create): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: '${routePath}/create',
+                method: 'post',
+                data: data
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('新增失败.'));
+            });
+        });
+    }
+
+    /**
+     * 获取编辑数据
+     *
+     * @param id 主键
+     * @return 编辑数据
+     */
+    public static async getEditData(id: string): Promise<Edit> {
+        return new Promise<Edit>((resolve, reject) => {
+            request({
+                url: `${routePath}/edit/${doller}{id}`,
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO_T<Edit>).data);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取编辑数据失败.'));
+            });
+        });
+    }
+
+    /**
+     * 编辑
+     *
+     * @param data 数据
+     * @return 操作结果
+     */
+    public static async edit(data: Edit): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: '${routePath}/edit',
+                method: 'post',
+                data: data
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('编辑失败.'));
+            });
+        });
+    }
+
+    /**
+     * 删除
+     *
+     * @param ids 主键集合
+     * @return 操作结果
+     */
+    public static async delete_(ids: string[]): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: '${routePath}/delete',
+                method: 'post',
+                data: ids
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('删除失败.'));
+            });
+        });
+    }
+#if($sort)
+
+    /**
+     * 排序
+     *
+     * @param data 数据
+     * @return 操作结果
+     */
+    public static async sort(data: DataSortDTO<string>): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: '${routePath}/sort',
+                method: 'post',
+                data: data
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('排序失败.'));
+            });
+        });
+    }
+
+    /**
+     * 拖动排序
+     *
+     * @param data 数据
+     * @return 操作结果
+     */
+    #if($tree)
+    public static async dragSort(data: TreeDragSortDTO<string>): Promise<string> {
+    #else
+    public static async dragSort(data: DragSortDTO<string>): Promise<string> {
+    #end
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: '${routePath}/drag-sort',
+                method: 'post',
+                data: data
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('拖动排序失败.'));
+            });
+        });
+    }
+#end
+#if($enable)
+
+    /**
+     * 启用/禁用
+     *
+     * @param id     主键
+     * @param enable true：启用，false：禁用
+     * @return 操作结果
+     */
+    public static async enable(id: string, enable: boolean): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: `${routePath}/enable/${doller}{id}/${doller}{enable}`,
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error(`${doller}{enable ? '启用' : '禁用'}失败.`));
+            });
+        });
+    }
+#end
+#if($lock)
+
+    /**
+     * 锁定/解锁
+     *
+     * @param id     主键
+     * @param locked true：锁定，false：解锁
+     * @return 操作结果
+     */
+    public static async lock(id: string, locked: boolean): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: `${routePath}/lock/${doller}{id}/${doller}{locked}`,
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error(`${doller}{locked ? '锁定' : '解锁'}失败.`));
+            });
+        });
+    }
+#end
+#if($import)
+
+    /**
+     * 导入
+     * @注意 先使用上传组件上传文件，然后在用获取的id调用此服务
+     *
+     * @param personalFileId 个人文件信息Id
+     * @return 操作结果
+     */
+    public static async import_(personalFileId: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            request({
+                url: `${routePath}/import/${doller}{personalFileId}`,
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO).msg);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('导入失败.'));
+            });
+        });
+    }
+#end
+#if($export)
+    #if($tree)
+
+    /**
+     * 导出
+     *
+     * @param version        版本（默认值 xlsx）
+     * @param treeDataSearch 树状列表数据搜索参数
+     */
+    public static export_(version: ExcelVersion = ExcelVersion.xlsx, treeDataSearch?: TreeDataSearchDTO): void {
+        await useDownload(
+            () => request.get(
+                `${routePath}/export/${doller}{version}?treeDataSearchJson=${doller}{encodeURIComponent(JSON.stringify(treeDataSearch ?? {}))}&jwt-token=${doller}{getCookie('token')}`,
+                {responseType: 'blob'}));
+
+        ## const a = document.createElement('a');
+        ## a.style.display = 'none';
+        ## a.href = `${doller}{import.meta.env.VITE_APP_BASE_URL}${routePath}/export/${doller}{version}?treeDataSearchJson=${doller}{encodeURIComponent(JSON.stringify(treeDataSearch ?? {}))}&jwt-token=${doller}{getCookie('token')}`;
+        ## document.body.appendChild(a);
+        ## a.click();
+        ## document.body.removeChild(a);
+    }
+    #else
+
+    /**
+     * 导出
+     *
+     * @param version    版本（默认值 xlsx）
+     * @param dataSearch 数据搜索参数
+     */
+    public static export_(version: ExcelVersion = ExcelVersion.xlsx, dataSearch?: DataSearchDTO): void {
+        await useDownload(
+            () => request.get(
+                `${routePath}/export/${doller}{version}?dataSearchJson=${doller}{encodeURIComponent(JSON.stringify(dataSearch ?? {}))}&jwt-token=${doller}{getCookie('token')}`,
+                {responseType: 'blob'}));
+
+        ## const a = document.createElement('a');
+        ## a.style.display = 'none';
+        ## a.href = `${doller}{import.meta.env.VITE_APP_BASE_URL}${routePath}/export/${doller}{version}?dataSearchJson=${doller}{encodeURIComponent(JSON.stringify(dataSearch ?? {}))}&jwt-token=${doller}{getCookie('token')}`;
+        ## document.body.appendChild(a);
+        ## a.click();
+        ## document.body.removeChild(a);
+    }
+    #end
+#end
+#foreach($constEnum in $constEnumList)
+    #if($constEnum.type == "常量")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}集合
+     */
+    public static async ${constEnum.name}List(): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            request({
+                url: '${routePath}/${constEnum.name}-list',
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO_T<string[]>).data);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取所有${constEnum.explain}失败.'));
+            })
+        });
+    }
+    #elseif($constEnum.type == "枚举")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}键值对集合
+     */
+    public static async ${constEnum.name}Map(): Promise<Record<string, string>> {
+        return new Promise<Record<string, string>>((resolve, reject) => {
+            request({
+                url: '${routePath}/${constEnum.name}-map',
+                method: 'get'
+            }).then((response: any) => {
+                resolve((response as RuoyiApiResultDataDTO_T<Record<string, string>>).data);
+            }).catch(error => {
+                console.error(error);
+                reject(new Error('获取所有${constEnum.explain}失败.'));
+            })
+        });
+    }
+    #end
+#end
+}

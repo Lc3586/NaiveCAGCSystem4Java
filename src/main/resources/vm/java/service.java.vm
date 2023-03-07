@@ -1,0 +1,228 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.service.${table.moduleName};
+
+import com.ruoyi.common.exception.ServiceException;
+#if($tree)
+import com.ruoyi.dto.utils.TreeDataSearchDTO;
+#else
+import com.ruoyi.dto.utils.DataSearchDTO;
+#end
+#if($sort)
+import com.ruoyi.dto.utils.DataSortDTO;
+    #if($tree)
+import com.ruoyi.dto.utils.TreeDragSortDTO;
+    #else
+import com.ruoyi.dto.utils.DragSortDTO;
+    #end
+#end
+#if($export)
+import project.extension.office.excel.ExcelVersion;
+#end
+import ${packageName}.dto.${table.moduleName}.${businessName_lower}DTO.*;
+
+import java.util.Collection;
+
+/**
+ * ${table.title}服务接口类
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+public interface I${table.businessName}Service {
+#if($tree)
+
+    /**
+     * 树状列表数据
+     *
+     * @param dataSearch 搜索参数
+     * @return 树状列表数据
+     */
+    java.util.List<List> treeList(TreeDataSearchDTO dataSearch)
+            throws
+            ServiceException;
+#else
+
+    /**
+     * 列表数据
+     *
+     * @param dataSearch 搜索参数
+     * @return 列表数据
+     */
+    java.util.List<List> list(DataSearchDTO dataSearch)
+            throws
+            ServiceException;
+#end
+
+    /**
+     * 详情数据
+     *
+     * @param id 主键
+     * @return 详情数据
+     */
+    Detail detail(String id)
+            throws
+            ServiceException;
+
+    /**
+     * 新增
+     *
+     * @param data 数据
+     */
+    void create(Create data)
+            throws
+            ServiceException;
+
+    /**
+     * 获取编辑数据
+     *
+     * @param id 主键
+     * @return 编辑数据
+     */
+    Edit edit(String id)
+            throws
+            ServiceException;
+
+    /**
+     * 编辑
+     *
+     * @param data 数据
+     */
+    void edit(Edit data)
+            throws
+            ServiceException;
+
+    /**
+     * 删除
+     *
+     * @param ids 主键集合
+     */
+    void delete(Collection<String> ids)
+            throws
+            ServiceException;
+#if($sort)
+
+    /**
+     * 排序
+     *
+     * @param data 数据
+     */
+    void sort(DataSortDTO<String> data)
+            throws
+            ServiceException;
+    #if($tree)
+
+    /**
+     * 拖动排序
+     *
+     * @param data 数据
+     */
+    void dragSort(TreeDragSortDTO<String> data)
+            throws
+            ServiceException;
+    #else
+
+    /**
+     * 拖动排序
+     *
+     * @param data 数据
+     */
+    void dragSort(DragSortDTO<String> data)
+            throws
+            ServiceException;
+    #end
+#end
+#if($enable)
+
+    /**
+     * 启用/禁用
+     *
+     * @param id     主键
+     * @param enable true：启用，false：禁用
+     */
+    void enable(String id, Boolean enable)
+            throws
+            ServiceException;
+#end
+#if($lock)
+
+    /**
+     * 锁定/解锁
+     *
+     * @param id     主键
+     * @param locked true：锁定，false：解锁
+     */
+    void lock(String id, Boolean locked)
+            throws
+            ServiceException;
+#end
+#if($import)
+
+    /**
+     * 导入数据
+     *
+     * @param personalFileId 上传Excel文件后获取的个人文件信息Id
+     */
+    void import_(String personalFileId);
+#end
+#if($export)
+    #if($tree)
+
+    /**
+     * 导出数据
+     *
+     * @param version            版本（xls, xlsx）
+     * @param treeDataSearchJson 树状列表搜索参数Json字符串
+     */
+    void export(ExcelVersion version,
+                String treeDataSearchJson);
+    #else
+
+    /**
+     * 导出数据
+     *
+     * @param version        版本（xls, xlsx）
+     * @param dataSearchJson 搜索参数Json字符串
+     */
+    void export(ExcelVersion version,
+                String dataSearchJson);
+    #end
+#end
+#foreach($constEnum in $constEnumList)
+    #if($constEnum.type == "常量")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}集合
+     */
+    java.util.List<String> ${constEnum.name}List()
+            throws
+            ServiceException;
+    #elseif($constEnum.type == "枚举")
+
+    /**
+     * 获取所有${constEnum.explain}
+     *
+     * @return ${constEnum.explain}键值对集合
+     */
+    java.util.Map<String, String> ${constEnum.name}Map()
+            throws
+            ServiceException;
+    #end
+#end
+}

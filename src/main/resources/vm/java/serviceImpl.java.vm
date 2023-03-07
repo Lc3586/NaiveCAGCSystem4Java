@@ -1,0 +1,1141 @@
+/**\_________________________________________________________________________________________________
+|*												说明											 __≣|
+|* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|*      此代码由VM模板自动生成																	|
+|*		版本:v0.0.0.1                                                                           |__
+|*		日期:${dateTime}                                                                   ≣|
+|*																	create by    LCTR              ≣|
+|*																	generate by  ${currentOpName}≣|
+|* ________________________________________________________________________________________________≣|
+\*/
+
+
+
+package ${packageName}.service.${table.moduleName}.impl;
+
+#if($import)
+import java.io.FileInputStream;
+#end
+#if($export)
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletResponse;
+#end
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+#if($tree)
+import org.springframework.util.StringUtils;
+#end
+#if($export)
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import com.alibaba.fastjson.JSON;
+#end
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.service.utils.DataSearchExtension;
+import com.ruoyi.service.utils.EntityExtension;
+#if($tree)
+import project.extension.collections.CollectionsExtension;
+#end
+#if($export)
+import project.extension.date.DateExtension;
+import project.extension.mybatis.core.provider.standard.ISelect;
+import project.extension.number.NumericExtension;
+#end
+import project.extension.mybatis.INaiveSql;
+#if($tree)
+import project.extension.mybatis.core.provider.standard.ISelect;
+#end
+#if($sort)
+import project.extension.mybatis.core.provider.standard.ISelect;
+import project.extension.mybatis.extention.RepositoryExtension;
+#end
+import project.extension.mybatis.core.repository.IBaseRepository_Key;
+import project.extension.mybatis.model.*;
+#if($import)
+import com.ruoyi.entity.domain.common.CommonFile;
+import com.ruoyi.dto.common.FileState;
+#end
+#if($export)
+import com.ruoyi.entity.entityFields.Base_Fields;
+#end
+#if($tree)
+import com.ruoyi.dto.utils.TreeDataSearchDTO;
+#else
+import com.ruoyi.dto.utils.DataSearchDTO;
+#end
+#if($sort)
+import com.ruoyi.dto.utils.DataSortDTO;
+import com.ruoyi.dto.utils.SortMethod;
+    #if($tree)
+import com.ruoyi.dto.utils.TreeDragSortDTO;
+    #else
+import com.ruoyi.dto.utils.DragSortDTO;
+    #end
+#end
+import ${packageName}.entity.domain.${table.moduleName}.${entityName};
+import ${packageName}.entity.entityFields.${table.moduleName}.${initialsName}_Fields;
+import ${packageName}.dto.${table.moduleName}.${businessName_lower}DTO.*;
+#foreach($constEnum in $constEnumList)
+import ${packageName}.dto.${table.moduleName}.${constEnum.name};
+#end
+import ${packageName}.service.${table.moduleName}.I${table.businessName}Service;
+
+import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Objects;
+#if($tree)
+import java.util.Objects;
+import java.util.ArrayList;
+#end
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * ${table.title}服务
+#if($table.description)
+ * ${table.description}
+#end
+ *
+ * @author ${table.signature}
+ * @date ${date}
+ */
+@Service
+@Scope("prototype")
+public class ${table.businessName}ServiceImpl
+        implements I${table.businessName}Service {
+    public ${table.businessName}ServiceImpl(INaiveSql naiveSql)
+            throws
+            Exception {
+        this.repository_Key = naiveSql.getRepository_Key(${entityName}.class,
+                                                         String.class);
+        this.tableKeyAliasMap = new HashMap<>();
+        this.tableKeyAliasMap.put(defaultTableKey,
+                                  "a");
+    }
+
+    private final IBaseRepository_Key<${entityName}, String> repository_Key;
+
+    /**
+     * 日志组件
+     */
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    /**
+     * 数据表前端标识和别名映射
+     */
+    private final Map<String, String> tableKeyAliasMap;
+
+    /**
+     * 默认的数据库表标识
+     */
+    private final String defaultTableKey = "main";
+#if($tree)
+
+    /**
+     * 递归获取树状列表
+     *
+     * @param dataSearch 搜索参数
+     * @param deep       处于递归中
+     * @param treeIds    树状集合的id链，防止死循环
+     * @return 树状列表
+     */
+    private java.util.List<List> getTreeList(TreeDataSearchDTO dataSearch,
+                                                 boolean deep,
+                                                 java.util.List<String> treeIds)
+            throws
+            Exception {
+        if (dataSearch.getParentId() != null && !StringUtils.hasText(dataSearch.getParentId()))
+            dataSearch.setParentId(null);
+
+        java.util.List<List> treeList = repository_Key.select()
+                                                          .as(tableKeyAliasMap.get(defaultTableKey))
+                                                          .where(x -> x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                            FilterCompare.Eq,
+                                                                            dataSearch.getParentId()))
+                                                          .where(x -> x.and(DataSearchExtension.toDynamicFilter(dataSearch.getFilters(),
+                                                                                                                tableKeyAliasMap)))
+                                                          .orderBy(x -> dataSearch.getOrder() == null
+                                                                        ? x.orderBy(${initialsName}_Fields.${treeLevelCode})
+#if($sort)
+                                                                           .thenOrderBy(${initialsName}_Fields.${sortCode})
+#end
+                                                                        : x.orderBy(
+                                                                                DataSearchExtension.toDynamicOrder(dataSearch.getOrder(),
+                                                                                                                   tableKeyAliasMap)))
+                                                          .pagination(dataSearch.getPagination())
+                                                          .toList(List.class);
+
+        if (CollectionsExtension.anyPlus(treeList)) {
+            for (List item : treeList) {
+                java.util.List<String> _treeIds = deep
+                                                  ? CollectionsExtension.deepCopy(treeIds)
+                                                  : new ArrayList<>();
+
+                dataSearch.setParentId(item.getId());
+
+                Integer rank = dataSearch.getRank();
+                if (dataSearch.getAllLevel() || rank > 1) {
+                    //判断是否陷入死循环
+                    if (_treeIds.contains(item.getId()))
+                        return treeList;
+                    _treeIds.add(item.getId());
+、
+                    if (!dataSearch.getAllLevel())
+                        dataSearch.setRank(--rank);
+                    item.setChildren(getTreeList(dataSearch,
+                                                 true,
+                                                 _treeIds));
+                    item.setHasChildren(item.getChildren()
+                                            .size() > 0);
+                    item.setChildrenCount(item.getChildren()
+                                              .size());
+                } else {
+                    ISelect<${entityName}> childrenSelect = repository_Key.select()
+                                                                          .as(tableKeyAliasMap.get(defaultTableKey))
+                                                                          .where(x -> x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                                            FilterCompare.Eq,
+                                                                                            dataSearch.getParentId()))
+                                                                          .where(x -> x.and(
+                                                                                  DataSearchExtension.toDynamicFilter(dataSearch.getFilters(),
+                                                                                                                   tableKeyAliasMap)));
+                    item.setHasChildren(childrenSelect.any());
+                    item.setChildrenCount(Integer.parseInt(Long.toString(childrenSelect.count())));
+                }
+            }
+        } else if (deep)
+            treeList = new ArrayList<>();
+        return treeList;
+    }
+
+    @Override
+    public java.util.List<List> treeList(TreeDataSearchDTO dataSearch)
+            throws
+            ServiceException {
+        try {
+            return getTreeList(dataSearch,
+                               false,
+                               null);
+        } catch (Exception ex) {
+            throw new ServiceException("查询数据失败",
+                                       ex);
+        }
+    }
+#else
+
+    @Override
+    public java.util.List<List> list(DataSearchDTO dataSearch)
+            throws
+            ServiceException {
+        try {
+            return repository_Key.select()
+                                 .as(tableKeyAliasMap.get(defaultTableKey))
+                                 .where(x -> x.and(DataSearchExtension.toDynamicFilter(dataSearch.getFilters(),
+                                                                                       tableKeyAliasMap)))
+                                 .orderBy(x -> dataSearch.getOrder() == null
+                                               ? x.orderBy(
+                                             ${initialsName}_Fields.createTime)
+                                               : x.orderBy(DataSearchExtension.toDynamicOrder(dataSearch.getOrder(),
+                                                                                              tableKeyAliasMap)))
+                                 .pagination(dataSearch.getPagination())
+                                 .toList(List.class);
+        } catch (Exception ex) {
+            throw new ServiceException("查询数据失败",
+                                       ex);
+        }
+    }
+#end
+
+    @Override
+    public Detail detail(String id)
+            throws
+            ServiceException {
+        try {
+            return repository_Key.getByIdAndCheckNull(id,
+                                                      Detail.class);
+        } catch (NullResultException ex) {
+            throw new ServiceException(ex.getMessage());
+        } catch (Throwable ex) {
+            throw new ServiceException("获取详情数据失败",
+                                       ex);
+        }
+    }
+#if($tree)
+
+    @Override
+    public void create(Create data)
+            throws
+            ServiceException {
+        try {
+            //防重验证
+        //    if (repository_Key.select()
+        //                      .where(x ->
+        //                                     x.and(${initialsName}_Fields.${treeParentIdCode},
+        //                                           FilterCompare.Eq,
+        //                                           data.getParentId())
+        //                                      .and(${initialsName}_Fields.code,
+        //                                           FilterCompare.Eq,
+        //                                           data.getCode()))
+        //                      .any())
+        //        throw new ServiceException(String.format("同层级下已存在编码为[%s]的数据",
+        //                                                 data.getCode()));
+
+            if (StringUtils.hasText(data.get${treeParentIdCode4Method}())) {
+                Map<String, Object> parent = repository_Key.withTransactional(true)
+                                                            .select()
+                                                            .columns(${initialsName}_Fields.id,
+                                                                     ${initialsName}_Fields.${treeRootIdCode},
+                                                                     ${initialsName}_Fields.${treeParentIdCode},
+                                                                     ${initialsName}_Fields.${treeLevelCode},
+                                                                     ${initialsName}_Fields.${sortCode})
+                                                            .where(x -> x.and(${initialsName}_Fields.id,
+                                                                              FilterCompare.Eq,
+                                                                              data.get${treeParentIdCode4Method}()))
+                                                            .firstMap();
+
+                if (parent == null || parent.size() == 0)
+                    throw new ServiceException("指定的父级不存在或已被移除");
+
+                data.set${treeRootIdCode4Method}((String) RepositoryExtension.getMapValueByFieldName(parent,
+                                                                                                     ${initialsName}_Fields.${treeRootIdCode}));
+                data.set${treeLevelCode4Method}((String) RepositoryExtension.getMapValueByFieldName(parent,
+                                                                                                     ${initialsName}_Fields.${treeLevelCode}));
+            } else {
+                data.set${treeParentIdCode4Method}(null);
+                data.set${treeRootIdCode4Method}(null);
+                data.set${treeLevelCode4Method}(1);
+            }
+#if($sort)
+
+            long sort = repository_Key.select()
+    #if($tree)
+                                      .where(x -> x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                        FilterCompare.Eq,
+                                                        data.get${treeParentIdCode4Method}()))
+    #end
+                                      .count() + 1;
+
+            data.set${sortCode4Method}(Integer.parseInt(Long.toString(sort)));
+#end
+
+            repository_Key.insert(EntityExtension.initialization(data),
+                                  Create.class,
+                                  1);
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("新增数据失败",
+                                       ex);
+        }
+    }
+#else
+
+    @Override
+    public void create(Create data)
+            throws
+            ServiceException {
+        try {
+            repository_Key.insert(EntityExtension.initialization(data),
+                                  Create.class,
+                                  1);
+        } catch (Exception ex) {
+            throw new ServiceException("新增数据失败",
+                                       ex);
+        }
+    }
+#end
+
+    @Override
+    public Edit edit(String id)
+            throws
+            ServiceException {
+        try {
+            return repository_Key.getByIdAndCheckNull(id,
+                                                      Edit.class,
+                                                      1);
+        } catch (NullResultException ex) {
+            throw new ServiceException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new ServiceException("获取编辑数据失败",
+                                       ex);
+        }
+    }
+#if($tree)
+
+    @Override
+    public void edit(Edit data)
+            throws
+            ServiceException {
+        try {
+            //防重验证
+//            if (repository_Key.select()
+//                              .where(x ->
+//                                             x.and(${initialsName}_Fields.${treeParentIdCode},
+//                                                   FilterCompare.Eq,
+//                                                   data.getParentId())
+//                                              .and(${initialsName}_Fields.code,
+//                                                   FilterCompare.Eq,
+//                                                   data.getCode())
+//                                              .and(${initialsName}_Fields.id,
+//                                                   FilterCompare.NotEq,
+//                                                   data.getId()))
+//                              .any())
+//                throw new ServiceException(String.format("同层级下已存在编码为[%s]的数据",
+//                                                         data.getCode()));
+
+            repository_Key.update(EntityExtension.modify(data),
+                                  Edit.class,
+                                  1);
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("编辑数据失败",
+                                       ex);
+        }
+    }
+#else
+
+    @Override
+    public void edit(Edit data)
+            throws
+            ServiceException {
+        try {
+            if (!repository_Key.select()
+                               .where(x ->
+                                              x.and(${initialsName}_Fields.id,
+                                                    FilterCompare.Eq,
+                                                    data.getId()))
+                               .any())
+                throw new ServiceException("数据不存在或已被移除");
+
+            repository_Key.update(EntityExtension.modify(data),
+                                  Edit.class,
+                                  1);
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("编辑数据失败",
+                                       ex);
+        }
+    }
+#end
+
+    @Override
+    @Transactional
+    public void delete(Collection<String> ids)
+            throws
+            ServiceException {
+        try {
+            repository_Key.withTransactional(true)
+                          .deleteByIds(ids);
+        } catch (Exception ex) {
+            throw new ServiceException("删除数据失败",
+                                       ex);
+        }
+    }
+#if($sort)
+
+    @Override
+    @Transactional
+    public void sort(DataSortDTO<String> data)
+            throws
+            ServiceException {
+        try {
+            //跨度为0并且也不是置顶和置底操作，判定为无意义的操作
+            if (data.getSpan() == 0 && (data.getMethod() != SortMethod.TOP || data.getMethod() != SortMethod.LOW))
+                return;
+
+            Map<String, Object> current = repository_Key.withTransactional(true)
+                                                        .select()
+                                                        .columns(${initialsName}_Fields.id,
+    #if($tree)
+                                                                 ${initialsName}_Fields.parentId,
+    #end
+                                                                 ${initialsName}_Fields.sort)
+                                                        .where(x -> x.and(${initialsName}_Fields.id,
+                                                                          FilterCompare.Eq,
+                                                                          data.getId()))
+                                                        .firstMap();
+
+            if (current == null || current.size() == 0)
+                throw new ServiceException("数据不存在或已被移除");
+
+            ISelect<${entityName}> targetSelect = repository_Key.select()
+                                                                .columns(${initialsName}_Fields.id,
+                                                                         ${initialsName}_Fields.${sortCode});
+            Map<String, Object> target;
+
+            switch (data.getMethod()) {
+                case TOP:
+                    target = targetSelect
+    #if($tree)
+                                           .where(x -> x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                              FilterCompare.Eq,
+                                                              RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                         ${initialsName}_Fields.${treeParentIdCode})))
+    #end
+                                           .orderBy(x -> x.orderBy(${initialsName}_Fields.${sortCode}))
+                                           .firstMap();
+                    break;
+                case UP:
+                    target = targetSelect
+    #if($tree)
+                                           .where(x ->
+                                                          x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                FilterCompare.Eq,
+                                                                RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                           ${initialsName}_Fields.${treeParentIdCode}))
+                                                           .and(${initialsName}_Fields.${sortCode},
+                                                                FilterCompare.Lt,
+                                                                RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                           ${initialsName}_Fields.${sortCode})))
+    #else
+                                           .where(x -> x.and(${initialsName}_Fields.${sortCode},
+                                                              FilterCompare.Lt,
+                                                             RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                        ${initialsName}_Fields.${sortCode})))
+    #end
+                                           .orderBy(x -> x.orderByDescending(${initialsName}_Fields.${sortCode}))
+                                           .firstMap();
+                    break;
+                case DOWN:
+                    target = targetSelect
+    #if($tree)
+                                           .where(x ->
+                                                          x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                FilterCompare.Eq,
+                                                                RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                           ${initialsName}_Fields.${treeParentIdCode}))
+                                                           .and(${initialsName}_Fields.${sortCode},
+                                                                FilterCompare.Gt,
+                                                                RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                           ${initialsName}_Fields.${sortCode})))
+    #else
+                                           .where(x -> x.and(${initialsName}_Fields.${sortCode},
+                                                              FilterCompare.Gt,
+                                                              RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                         ${initialsName}_Fields.${sortCode})))
+    #end
+                                           .orderBy(x -> x.orderBy(${initialsName}_Fields.${sortCode}))
+                                           .firstMap();
+                    break;
+                case LOW:
+                    target = targetSelect
+    #if($tree)
+                                           .where(x -> x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                              FilterCompare.Eq,
+                                                              RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                         ${initialsName}_Fields.${treeParentIdCode})))
+    #end
+                                           .orderBy(x -> x.orderByDescending(${initialsName}_Fields.${sortCode}))
+                                           .firstMap();
+                    break;
+                default:
+                    throw new ServiceException(String.format("不支持此排序方法%s",
+                                                             data.getMethod()));
+            }
+
+            //目标为空，判定为无意义的操作
+            if (target == null || target.size() == 0)
+                return;
+
+            if (repository_Key.updateDiy()
+                              .set(${initialsName}_Fields.${sortCode},
+                                   RepositoryExtension.getMapValueByFieldName(current,
+                                                                              ${initialsName}_Fields.${sortCode}))
+                              .where(x -> x.and(${initialsName}_Fields.id,
+                                                FilterCompare.Eq,
+                                                RepositoryExtension.getMapValueByFieldName(target,
+                                                                                           ${initialsName}_Fields.id)))
+                              .executeAffrows() < 0
+                    || repository_Key.updateDiy()
+                                     .set(${initialsName}_Fields.${sortCode},
+                                          RepositoryExtension.getMapValueByFieldName(target,
+                                                                                     ${initialsName}_Fields.${sortCode}))
+                                     .where(x -> x.and(${initialsName}_Fields.id,
+                                                       FilterCompare.Eq,
+                                                       RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                  ${initialsName}_Fields.id)))
+                                     .executeAffrows() < 0)
+                throw new ServiceException("排序失败");
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("排序失败",
+                                       ex);
+        }
+    }
+    #if($tree)
+
+    @Override
+    @Transactional
+    public void dragSort(TreeDragSortDTO<String> data)
+            throws
+            ServiceException {
+        try {
+            //操作对象和目标对象相同，判定为无意义的操作
+            if (data.getId()
+                    .equals(data.getTargetId()))
+                return;
+
+            Map<String, Object> current = repository_Key.withTransactional(true)
+                                                        .select()
+                                                        .columns(${initialsName}_Fields.id,
+                                                                 ${initialsName}_Fields.${treeParentIdCode},
+                                                                 ${initialsName}_Fields.${sortCode})
+                                                        .where(x -> x.and(${initialsName}_Fields.id,
+                                                                          FilterCompare.Eq,
+                                                                          data.getId()))
+                                                        .firstMap();
+
+            if (current == null || current.size() == 0)
+                throw new ServiceException("数据不存在或已被移除");
+
+            Map<String, Object> target = repository_Key.select()
+                                                       .columns(${initialsName}_Fields.id,
+                                                                ${initialsName}_Fields.${treeRootIdCode},
+                                                                ${initialsName}_Fields.${treeParentIdCode},
+                                                                ${initialsName}_Fields.${treeLevelCode},
+                                                                ${initialsName}_Fields.${sortCode})
+                                                       .where(x -> x.and(${initialsName}_Fields.id,
+                                                                         FilterCompare.Eq,
+                                                                         data.getTargetId()))
+                                                       .firstMap();
+
+            if (target == null || target.size() == 0)
+                throw new ServiceException("目标数据不存在");
+
+            if (!data.getInside() && Objects.equals(
+                    RepositoryExtension.getMapValueByFieldName(current,
+                                                               ${initialsName}_Fields.${treeParentIdCode}),
+                    RepositoryExtension.getMapValueByFieldName(target,
+                                                               ${initialsName}_Fields.${treeParentIdCode}))) {
+                ISelect<${entityName}> targetNewSelect = repository_Key.select()
+                                                                       .columns(${initialsName}_Fields.id,
+                                                                                ${initialsName}_Fields.${sortCode});
+                //同层级排序
+                Map<String, Object> targetNew;
+
+                if (data.getAppend()) {
+                    targetNew = targetNewSelect
+                                               .where(x ->
+                                                              x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                    FilterCompare.Eq,
+                                                                    RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                               ${initialsName}_Fields.${treeParentIdCode}))
+                                                               .and(${initialsName}_Fields.${sortCode},
+                                                                    FilterCompare.Eq,
+                                                                    (int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                                     ${initialsName}_Fields.${sortCode}) + 1))
+                                               .firstMap();
+                } else {
+                    targetNew = targetNewSelect
+                                               .where(x ->
+                                                              x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                                    FilterCompare.Eq,
+                                                                    RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                               ${initialsName}_Fields.${treeParentIdCode}))
+                                                               .and(${initialsName}_Fields.${sortCode},
+                                                                    FilterCompare.Eq,
+                                                                    (int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                                     ${initialsName}_Fields.${sortCode}) - 1))
+                                               .firstMap();
+                }
+
+                if (repository_Key.updateDiy()
+                                  .set(${initialsName}_Fields.${sortCode},
+                                       RepositoryExtension.getMapValueByFieldName(current,
+                                                                                  ${initialsName}_Fields.${sortCode}))
+                                  .where(x -> x.and(${initialsName}_Fields.id,
+                                                    FilterCompare.Eq,
+                                                    RepositoryExtension.getMapValueByFieldName(targetNew == null
+                                                                                               ? target
+                                                                                               : targetNew,
+                                                                                               ${initialsName}_Fields.id)))
+                                  .executeAffrows() < 0
+                        || repository_Key.updateDiy()
+                                         .set(${initialsName}_Fields.${sortCode},
+                                              RepositoryExtension.getMapValueByFieldName(targetNew == null
+                                                                                         ? target
+                                                                                         : targetNew,
+                                                                                         ${initialsName}_Fields.${sortCode}))
+                                         .where(x -> x.and(${initialsName}_Fields.id,
+                                                           FilterCompare.Eq,
+                                                           RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                      ${initialsName}_Fields.id)))
+                                         .executeAffrows() < 0)
+                    throw new ServiceException("排序失败");
+            } else {
+                //异层级排序
+                if (repository_Key.updateDiy()
+                                  .set(${initialsName}_Fields.${sortCode},
+                                       Integer.class,
+                                       x -> x.operationWithValue(OperationSymbol.Reduce,
+                                                                 1))
+                                  .where(x ->
+                                                 x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                       FilterCompare.Eq,
+                                                       RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                  ${initialsName}_Fields.${treeParentIdCode}))
+                                                  .and(${initialsName}_Fields.${sortCode},
+                                                       FilterCompare.Gt,
+                                                       RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                  ${initialsName}_Fields.${sortCode})))
+                                  .executeAffrows() < 0
+                        || repository_Key.updateDiy()
+                                         .set(${initialsName}_Fields.${sortCode},
+                                              Integer.class,
+                                              x -> x.operationWithValue(OperationSymbol.Plus,
+                                                                        1))
+                                         .where(x ->
+                                                        x.and(${initialsName}_Fields.${treeParentIdCode},
+                                                              FilterCompare.Eq,
+                                                              RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                         ${initialsName}_Fields.${treeParentIdCode}))
+                                                         .and(${initialsName}_Fields.${sortCode},
+                                                              FilterCompare.Gt,
+                                                              data.getInside()
+                                                              ? 0
+                                                              : (data.getAppend()
+                                                                 ? RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                            ${initialsName}_Fields.${sortCode})
+                                                                 : ((int) RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                                     ${initialsName}_Fields.${sortCode}) - 1))))
+                                         .executeAffrows() < 0
+                        || repository_Key.updateDiy()
+                                         .set(${initialsName}_Fields.${sortCode},
+                                              data.getInside()
+                                              ? 1
+                                              : (data.getAppend()
+                                                 ? ((int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                     ${initialsName}_Fields.${sortCode}) + 1)
+                                                 : RepositoryExtension.getMapValueByFieldName(target,
+                                                                                              ${initialsName}_Fields.${sortCode})))
+                                         .set(${initialsName}_Fields.${treeParentIdCode},
+                                              data.getInside()
+                                              ? RepositoryExtension.getMapValueByFieldName(target,
+                                                                                           ${initialsName}_Fields.id)
+                                              : RepositoryExtension.getMapValueByFieldName(target,
+                                                                                           ${initialsName}_Fields.${treeParentIdCode}))
+                                         .set(${initialsName}_Fields.${treeLevelCode},
+                                              data.getInside()
+                                              ? ((int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                  ${initialsName}_Fields.${treeLevelCode}) + 1)
+                                              : RepositoryExtension.getMapValueByFieldName(target,
+                                                                                           ${initialsName}_Fields.${treeLevelCode}))
+                                         .set(${initialsName}_Fields.${treeRootIdCode},
+                                              RepositoryExtension.getMapValueByFieldName(target,
+                                                                                         ${initialsName}_Fields.${treeRootIdCode}))
+                                         .where(x -> x.and(${initialsName}_Fields.id,
+                                                           FilterCompare.Eq,
+                                                           RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                      ${initialsName}_Fields.id)))
+                                         .executeAffrows() < 0)
+                    throw new ServiceException("排序失败");
+            }
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("排序失败",
+                                       ex);
+        }
+    }
+    #else
+
+    @Override
+    @Transactional
+    public void dragSort(DragSortDTO<String> data)
+            throws
+            ServiceException {
+        try {
+            //操作对象和目标对象相同，判定为无意义的操作
+            if (data.getId()
+                    .equals(data.getTargetId()))
+                return;
+
+            Map<String, Object> current = repository_Key.withTransactional(true)
+                                                        .select()
+                                                        .columns(${initialsName}_Fields.id,
+                                                                 ${initialsName}_Fields.${sortCode})
+                                                        .where(x -> x.and(${initialsName}_Fields.id,
+                                                                          FilterCompare.Eq,
+                                                                          data.getId()))
+                                                        .firstMap();
+
+            if (current == null || current.size() == 0)
+                throw new ServiceException("数据不存在或已被移除");
+
+            Map<String, Object> target = repository_Key.select()
+                                                       .columns(${initialsName}_Fields.id,
+                                                                ${initialsName}_Fields.${sortCode})
+                                                       .where(x -> x.and(${initialsName}_Fields.id,
+                                                                         FilterCompare.Eq,
+                                                                         data.getTargetId()))
+                                                       .firstMap();
+
+            if (target == null || target.size() == 0)
+                throw new ServiceException("目标数据不存在");
+
+            ISelect<${entityName}> targetNewSelect = repository_Key.select()
+                                                                   .columns(${initialsName}_Fields.id,
+                                                                            ${initialsName}_Fields.${sortCode});
+            //同层级排序
+            Map<String, Object> targetNew;
+
+            if (data.getAppend()) {
+                targetNew = targetNewSelect
+                                           .where(x -> x.and(${initialsName}_Fields.${sortCode},
+                                                             FilterCompare.Eq,
+                                                             (int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                              ${initialsName}_Fields.${sortCode}) + 1))
+                                          .firstMap();
+            } else {
+                targetNew = targetNewSelect
+                                           .where(x -> x.and(${initialsName}_Fields.${sortCode},
+                                                             FilterCompare.Eq,
+                                                             (int) RepositoryExtension.getMapValueByFieldName(target,
+                                                                                                              ${initialsName}_Fields.${sortCode}) - 1))
+                                          .firstMap();
+            }
+
+            if (repository_Key.updateDiy()
+                              .set(${initialsName}_Fields.${sortCode},
+                                   RepositoryExtension.getMapValueByFieldName(current,
+                                                                              ${initialsName}_Fields.${sortCode}))
+                              .where(x -> x.and(${initialsName}_Fields.id,
+                                                FilterCompare.Eq,
+                                                RepositoryExtension.getMapValueByFieldName(targetNew == null
+                                                                                           ? target
+                                                                                           : targetNew,
+                                                                                           ${initialsName}_Fields.id)))
+                              .executeAffrows() < 0
+                    || repository_Key.updateDiy()
+                                     .set(${initialsName}_Fields.${sortCode},
+                                          RepositoryExtension.getMapValueByFieldName(targetNew == null
+                                                                                     ? target
+                                                                                     : targetNew,
+                                                                                     ${initialsName}_Fields.${sortCode}))
+                                     .where(x -> x.and(${initialsName}_Fields.id,
+                                                       FilterCompare.Eq,
+                                                       RepositoryExtension.getMapValueByFieldName(current,
+                                                                                                  ${initialsName}_Fields.id)))
+                                     .executeAffrows() < 0)
+                throw new ServiceException("排序失败");
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("排序失败",
+                                       ex);
+        }
+    }
+    #end
+#end
+#if($enable)
+
+    @Override
+    public void enable(String id,
+                       Boolean enable)
+            throws
+            ServiceException {
+        try {
+            if (repository_Key.updateDiy()
+                              .set(${initialsName}_Fields.${enableCode},
+                                   enable)
+                              .where(x -> x.and(${initialsName}_Fields.id,
+                                                FilterCompare.Eq,
+                                                id))
+                              .executeAffrows() < 0)
+                throw new Exception("数据库受影响行数有误");
+        } catch (Exception ex) {
+            throw new ServiceException(String.format("%s失败",
+                                                     enable
+                                                     ? "启用"
+                                                     : "禁用"),
+                                       ex);
+        }
+    }
+#end
+#if($lock)
+
+    @Override
+    public void lock(String id,
+                     Boolean locked)
+            throws
+            ServiceException {
+        try {
+            if (repository_Key.updateDiy()
+                              .set(${initialsName}_Fields.${lockCode},
+                                   locked)
+                              .where(x -> x.and(${initialsName}_Fields.id,
+                                                FilterCompare.Eq,
+                                                id))
+                              .executeAffrows() < 0)
+                throw new Exception("数据库受影响行数有误");
+        } catch (Exception ex) {
+            throw new ServiceException(String.format("%s失败",
+                                                     locked
+                                                     ? "锁定"
+                                                     : "解锁"),
+                                       ex);
+        }
+    }
+#end
+#if($import)
+
+    @Override
+    @Transactional
+    public void import_(String personalFileId) {
+        try {
+            //获取个人文件信息
+            PersonalFile personalFile = personalFileService.detail(personalFileId,
+                                                                   true);
+            //获取文件信息
+            CommonFile file = fileService.get(personalFile.getFileId(),
+                                              true);
+            if (!file.getState()
+                     .equals(FileState.可用))
+                throw new ServiceException("文件不可用" );
+
+            //读取数据
+            java.util.List<SheetInfo> sheetInfoList = ExcelHelper.read(new FileInputStream(fileService.getFilePath(file.getPath())),
+                                                                       false,
+                                                                       true);
+            java.util.List<Import> list = new ArrayList<>();
+            SheetInfo sheetInfo = sheetInfoList.get(0);
+
+            //所有相关的字段
+            java.util.List<Field> fields = SchemaExtension.getFields(Import.class,
+                                                                     false,
+                                                                     0,
+                                                                     null);
+
+            //获取列索引对应的字段
+            Map<Integer, Field> columnWithField = new HashMap<>();
+            for (int j = 0; j < sheetInfo.columnCount(); j++) {
+                for (Field field : fields) {
+                    OpenApiDescription descriptionAttribute = AnnotationUtils.findAnnotation(field,
+                                                                                             OpenApiDescription.class);
+                    String name = descriptionAttribute == null
+                                  ? field.getName()
+                                  : descriptionAttribute.value();
+                    if (sheetInfo.getColumn(j)
+                                 .getName()
+                                 .equals(name)) {
+                        field.setAccessible(true);
+                        columnWithField.put(j,
+                                            field);
+                        break;
+                    }
+                }
+            }
+
+            //遍历行
+            for (int i = 0; i < sheetInfo.rowCount(); i++) {
+                Import data = new Import();
+                //遍历列
+                for (int j = 0; j < sheetInfo.columnCount(); j++) {
+                    if (!columnWithField.containsKey(j))
+                        continue;
+
+                    Field field = columnWithField.get(j);
+                    Object value = sheetInfo.getData(i,
+                                                     j)
+                                            .getValue();
+                    if (field.getType()
+                             .equals(Boolean.class)
+                            || field.getType()
+                                    .equals(boolean.class))
+                        value = String.valueOf(value)
+                                      .equals("是" );
+
+                    field.set(data,
+                              value);
+                }
+                list.add(data);
+            }
+
+            if (list.size() == 0)
+                throw new ServiceException("未获取到任何数据" );
+
+            //批量插入数据
+            repository.withTransactional(true)
+                      .batchInsert(EntityExtension.initialization(list),
+                                   Import.class,
+                                   1);
+
+            //清理文件
+            fileService.delete(Collections.singleton(file.getId()),
+                               true);
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("导入数据失败" ,
+                                       ex);
+        }
+    }
+#end
+#if($export)
+
+    @Override
+    public void export(ExcelVersion version,
+                       String dataSearchJson) {
+        try {
+            DataSearchDTO dataSearch;
+            if (StringUtils.hasText(dataSearchJson))
+                dataSearch = JSON.parseObject(URLDecoder.decode(dataSearchJson,
+                                                                "UTF-8" ),
+                                              DataSearchDTO.class);
+            else
+                dataSearch = new DataSearchDTO();
+
+            ISelect<${entityName}> query = repository_Key.select()
+                                                          .as(tableKeyAliasMap.get(defaultTableKey))
+                                                          .where(x -> x.and(DataSearchExtension.toDynamicFilter(dataSearch.getFilters(),
+                                                                                                                tableKeyAliasMap)))
+                                                          .orderBy(x -> dataSearch.getOrder() == null
+                                                                        ? x.orderBy(Base_Fields.createTime)
+                                                                        : x.orderBy(DataSearchExtension.toDynamicOrder(dataSearch.getOrder(),
+                                                                                                                       tableKeyAliasMap)))
+                                                          .pagination(dataSearch.getPagination());
+
+            java.util.List<Export> list = query.toList(Export.class);
+
+            //创建工作表
+            SheetInfo sheetInfo = new SheetInfo()
+                    //工作表名称
+                    .setName("${table.title}导出数据" );
+
+            //所有相关的字段
+            java.util.List<Field> fields = SchemaExtension.getFields(Export.class,
+                                                                     false,
+                                                                     0,
+                                                                     null);
+
+            //设置列
+            for (Field field : fields) {
+                field.setAccessible(true);
+                //注释
+                OpenApiDescription descriptionAttribute = AnnotationUtils.findAnnotation(field,
+                                                                                         OpenApiDescription.class);
+                ColumnInfo columnInfo = new ColumnInfo().setName(descriptionAttribute == null
+                                                                 ? field.getName()
+                                                                 : descriptionAttribute.value());
+                if (field.getType()
+                         .equals(Boolean.class)
+                        || field.getType()
+                                .equals(boolean.class))
+                    columnInfo.setDropdownSelect(new String[]{"是" ,
+                                                              "否"});
+                sheetInfo.addColumn(columnInfo);
+            }
+
+            //设置默认样式
+            sheetInfo.setDefaultTitleStyle()
+                     .setDefaultHeaderStyle()
+                     .setDefaultDataStyle();
+
+            //设置数据
+            for (Export data : list) {
+                Map<Integer, CellDataInfo> row = new HashMap<>();
+                for (int i = 0; i < fields.size(); i++) {
+                    Field field = fields.get(i);
+                    Object value = field.get(data);
+
+                    CellDataInfo cellDataInfo = new CellDataInfo().setType(CellDataType.STRING);
+
+                    if (field.getType()
+                             .equals(String.class))
+                        //字符串
+                        cellDataInfo.setValue(value);
+                    else if (NumericExtension.isNumeric(field.getType()))
+                        //数字
+                        cellDataInfo.setType(CellDataType.NUMERIC)
+                                    .setValue(value.toString());
+                    else if (field.getType()
+                                  .equals(Boolean.class)
+                            || field.getType()
+                                    .equals(boolean.class))
+                        //布尔
+                        cellDataInfo.setValue((boolean) value
+                                              ? "是"
+                                              : "否" );
+                    else if (field.getType()
+                                  .equals(Date.class))
+                        //日期时间
+                        cellDataInfo.setValue(DateExtension.format(field,
+                                                                   (Date) value));
+                    else
+                        //其他
+                        cellDataInfo.setValue(value.toString());
+
+                    row.put(i,
+                            cellDataInfo);
+                }
+                sheetInfo.addRow(row);
+            }
+
+            ServletRequestAttributes servletRequestAttributes = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+            if (servletRequestAttributes == null || servletRequestAttributes.getResponse() == null)
+                throw new Exception("获取ServletRequestAttributes对象失败" );
+
+            HttpServletResponse response = servletRequestAttributes.getResponse();
+
+            //设置内容类型
+            response.setContentType(version.equals(ExcelVersion.xlsx)
+                                    ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    : "application/vnd.ms-excel" );
+            //设置下载文件名
+            response.setHeader("Content-Disposition" ,
+                               String.format("attachment; filename=\"%s.%s\"" ,
+                                             URLEncoder.encode("${table.title}导出数据" ,
+                                                               StandardCharsets.UTF_8.name()),
+                                             version));
+
+            //输出文件
+            ExcelHelper.export(sheetInfo,
+                               version,
+                               response.getOutputStream());
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException("导出数据失败" ,
+                                       ex);
+        }
+    }
+#end
+#foreach($constEnum in $constEnumList)
+    #if($constEnum.type == "常量")
+
+    @Override
+    public java.util.List<String> ${constEnum.name}List()
+            throws
+            ServiceException {
+        return Arrays.stream(${constEnum.name}.class.getDeclaredFields())
+                     .map(x -> {
+                         try {
+                             return (String) x.get(null);
+                         } catch (IllegalAccessException e) {
+                             return null;
+                         }
+                     })
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toList());
+    }
+    #elseif($constEnum.type == "枚举")
+
+    @Override
+    public java.util.Map<String, String> ${constEnum.name}Map()
+            throws
+            ServiceException {
+        return Arrays.stream(${constEnum.name}.values())
+                     .collect(Collectors.toMap(Enum::name,
+                                               ${constEnum.name}::toString));
+    }
+    #end
+#end
+}
