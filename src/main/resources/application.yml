@@ -69,7 +69,7 @@ spring:
 #服务配置
 service:
   #服务标识
-  key: 00000000-0000-0000-0000-000000000001
+  key: 00000000-0000-0000-0000-000000000003
   #服务名称
   name: Java代码自动生成服务系统
   #版本号
@@ -88,7 +88,7 @@ project:
       # mybatis配置文件路径
       configLocation: classpath:mybatis/mybatis-config.xml
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
-      scanEntitiesPackages: top.lctr.naive.file.system.entity.**
+      scanEntitiesPackages: top.lctr.naive.cagc.system.entity.**
       # 需要扫描的存放Mapper接口类的包（可选）
 #      scanMapperPackages: project.extension.mybatis.edge.mapper.**
       # 需要扫描的存放Mapper配置类的包
@@ -104,7 +104,7 @@ project:
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
-            url: ENC(SSpORgVScIribVtil+Lmmcdd4bU7/X9kcI1/N48uo0V/slXQ9lBWfy6PxET0D0iDf7duz9UzIcB4SltcbYD6tehPCMpMwxBNFwgzAiD/EjIBryYib60rCUoP3qiPF1N9EhpjGjn/yXkzwAVdvAyPwmkOseNYAsL7XfLrycE+waGWyOg2WL3Sr2wmipJ0v9DezypCE2+j3rphrOoNiAfNa7EsZKJ9Fb4YgxeXSYFwMQlZKuI+OFcccb2Ug/QjIGFV)
+            url: ENC(hCZiIsdWdh9e0hFNfMQoJuiw0jG+KfNPV3vIQtErCDZt7dYLFFTFea+WVQ8Yjdzi3ebobQhsBxPTe2QAh/0SXGtSeGaRWsEvJtryqGDPd1lA6lyCOLYl6oYGnFNgwyWet6nsT5jtvqQZaBGBYgz2iuD2yNwp2B3T17EatZjpchImc9wQmacjCvi5PifbUjk1u87gEQFjsnmLOXqTnerxLYok9Di2hx8kNfIfPHClgCqlZM4uZypD1uWGjNdDKAhlWy1Ppjm6RV4=)
             # 用户名
             username: ENC(LWfGadRuyaYT3ZIEFoEs/w==)
             # 密码
