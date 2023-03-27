@@ -110,60 +110,6 @@ project:
             # 密码
             password: ENC(Q88XTJSttazzBLg5bVN32Oyn0e5CagP/+MXtmSUYGxc=)
 
-#文件服务配置
-file:
-  #图片默认预览宽度
-  previewWidth: 200
-  #图片默认预览高度
-  previewHeight: 200
-  #大文件上传模块
-  upload-large-file:
-    #启用
-    enable: true
-    #线程池大小
-    threadPoolSize: 1
-    #定时检查未完成的任务的时间间隔(m)
-    checkInterval: 10
-    #定时清理分片文件的时间间隔(h)
-    clearInterval: 1
-    #集线器
-    hubConfig:
-      enable: true
-      #消息处理线程池大小
-      handlerThreadPoolSize: -1
-      #消息发送线程池大小
-      senderThreadPoolSize: -1
-  #文件修复
-  repair:
-    #启用
-    enable: true
-    #线程池大小
-    threadPoolSize: 1
-    #定时检查待修复的文件的时间间隔(h)
-    checkInterval: 6
-    #集线器
-    hubConfig:
-      enable: true
-      #消息处理线程池大小
-      handlerThreadPoolSize: -1
-      #消息发送线程池大小
-      senderThreadPoolSize: -1
-  #Word文件自动转换为Pdf文件
-  word2pdf:
-    #启用
-    enable: true
-    #线程池大小
-    threadPoolSize: 1
-    #定时检查待转换的文件的时间间隔(h)
-    checkInterval: 24
-    #集线器
-    hubConfig:
-      enable: true
-      #消息处理线程池大小
-      handlerThreadPoolSize: -1
-      #消息发送线程池大小
-      senderThreadPoolSize: -1
-
 jasypt:
   encryptor:
     password: ${JAVA_LCTR_TEST_JASYPT_PASSWORD}

@@ -26,12 +26,3 @@ service:
   key: 00000000-0000-0000-0000-00000000000X
   #启用swagger
   enableSwagger: true
-
-#文件服务配置
-file:
-  #ffmpeg程序文件路径
-  ffmpegFilePath: tools\ffmpeg\ffmpeg.exe
-  #ffmpeg程序文件路径
-  ffprobeFilePath: tools\ffmpeg\ffprobe.exe
-  #ffplay程序文件路径
-  ffplayFilePath: tools\ffmpeg\ffplay.exe
