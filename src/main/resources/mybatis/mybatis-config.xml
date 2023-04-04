@@ -19,6 +19,6 @@
 
     <!-- 添加实体映射 -->
     <typeAliases>
-        <package name="top.lctr.naive.file.system.entity"/>
+        <package name="top.lctr.naive.cagc.system.entity"/>
     </typeAliases>
 </configuration>
