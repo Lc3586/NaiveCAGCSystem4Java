@@ -1,7 +1,7 @@
 # 日志配置
 logging:
   level:
-    top.lctr.naive.file.system: debug
+    top.lctr.naive.cagc.system: debug
     org.springframework: warn
 
 # Spring配置
