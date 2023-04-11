@@ -158,7 +158,7 @@ public class ColumnServiceImpl
                                          .forEach(c -> indexes.put(c.getColumn()
                                                                     .getName(),
                                                                    new Tuple2<>(k,
-                                                                                c.getIsDesc()))));
+                                                                                c.isDesc()))));
 
             //唯一键 <列名, (唯一键名, 降序)>
             Map<String, Tuple2<String, Boolean>> uniques = new HashMap<>();
@@ -167,7 +167,7 @@ public class ColumnServiceImpl
                                          .forEach(c -> uniques.put(c.getColumn()
                                                                     .getName(),
                                                                    new Tuple2<>(k,
-                                                                                c.getIsDesc()))));
+                                                                                c.isDesc()))));
 
             //不属于列表功能的字段
             List<String> listDisableFields = Arrays.asList("remark",
@@ -205,7 +205,7 @@ public class ColumnServiceImpl
                 data.setName(columnInfo.getName());
                 data.setTitle(columnInfo.getComment());
 //                data.setDescription(columnInfo.getComment());
-                data.setPk(columnInfo.getIsPrimary());
+                data.setPk(columnInfo.isPrimary());
 
                 //外键
                 if (foreigns.containsKey(columnInfo.getName())) {
@@ -278,7 +278,7 @@ public class ColumnServiceImpl
                         break;
                 }
 
-                data.setRequired(!columnInfo.getIsNullable());
+                data.setRequired(!columnInfo.isNullable());
                 data.setQuery(false);
                 data.setSplit(false);
                 data.setList(listDisableFields.stream()

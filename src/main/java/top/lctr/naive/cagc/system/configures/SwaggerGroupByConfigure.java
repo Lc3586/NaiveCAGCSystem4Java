@@ -1,6 +1,7 @@
 package top.lctr.naive.cagc.system.configures;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -41,6 +42,12 @@ public class SwaggerGroupByConfigure {
     private final ApplicationContext applicationContext;
 
     /**
+     * 反向代理路径
+     */
+    @Value("${server.servlet.context-path}")
+    public String pathMapping;
+
+    /**
      * 创建允许匿名访问的接口文档
      */
     @Bean
@@ -55,7 +62,7 @@ public class SwaggerGroupByConfigure {
                 .build()
                 .securitySchemes(SwaggerConfigure.securitySchemes())
                 .securityContexts(SwaggerConfigure.securityContexts())
-                .pathMapping(SwaggerConfigure.pathMapping);
+                .pathMapping(pathMapping);
     }
 
     /**
@@ -110,7 +117,7 @@ public class SwaggerGroupByConfigure {
                     .build()
                     .securitySchemes(SwaggerConfigure.securitySchemes())
                     .securityContexts(SwaggerConfigure.securityContexts())
-                    .pathMapping(SwaggerConfigure.pathMapping);
+                    .pathMapping(pathMapping);
 
             //注入为单例
             defaultListableBeanFactory.registerSingleton(

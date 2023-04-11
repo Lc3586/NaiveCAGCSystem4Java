@@ -73,7 +73,7 @@
     </appender>
 
     <!-- 系统模块日志级别控制  -->
-    <logger name="top.lctr.naive.file.system" level="info"/>
+    <logger name="top.lctr.naive.cagc.system" level="info"/>
     <!-- Spring日志级别控制  -->
     <logger name="org.springframework" level="warn"/>
 

@@ -1115,14 +1115,14 @@ public class CagcServiceImpl
                 context = getEntityContext(table,
                                            packageName,
                                            authenticationService.getOperator()
-                                                                .getUsername());
+                                                                .getNickname());
                 template = "vm/java/entity.java.vm";
                 break;
             case 实体字段集合:
                 context = getEntityFieldsContext(table,
                                                  packageName,
                                                  authenticationService.getOperator()
-                                                                      .getUsername());
+                                                                      .getNickname());
                 template = "vm/java/entityFields.java.vm";
                 break;
             case 业务模型:
@@ -1130,7 +1130,7 @@ public class CagcServiceImpl
                                         table,
                                         packageName,
                                         authenticationService.getOperator()
-                                                             .getUsername());
+                                                             .getNickname());
                 template = "vm/java/dto.java.vm";
                 break;
             case 常量:
@@ -1138,7 +1138,7 @@ public class CagcServiceImpl
                                               constEnum,
                                               packageName,
                                               authenticationService.getOperator()
-                                                                   .getUsername());
+                                                                   .getNickname());
                 template = "vm/java/const.java.vm";
                 break;
             case 枚举:
@@ -1146,35 +1146,35 @@ public class CagcServiceImpl
                                               constEnum,
                                               packageName,
                                               authenticationService.getOperator()
-                                                                   .getUsername());
+                                                                   .getNickname());
                 template = "vm/java/enum.java.vm";
                 break;
             case 服务接口类:
                 context = getServiceContext(table,
                                             packageName,
                                             authenticationService.getOperator()
-                                                                 .getUsername());
+                                                                 .getNickname());
                 template = "vm/java/service.java.vm";
                 break;
             case 服务实现类:
                 context = getServiceContext(table,
                                             packageName,
                                             authenticationService.getOperator()
-                                                                 .getUsername());
+                                                                 .getNickname());
                 template = "vm/java/serviceImpl.java.vm";
                 break;
             case 控制器:
                 context = getControllerContext(table,
                                                packageName,
                                                authenticationService.getOperator()
-                                                                    .getUsername());
+                                                                    .getNickname());
                 template = "vm/java/controller.java.vm";
                 break;
             case TS模型字段集合:
                 context = getTSModelFieldsContext(table,
                                                   packageName,
                                                   authenticationService.getOperator()
-                                                                       .getUsername());
+                                                                       .getNickname());
                 template = "vm/ts/model_fields.ts.vm";
                 break;
             case TS业务模型:
@@ -1182,7 +1182,7 @@ public class CagcServiceImpl
                                           table,
                                           packageName,
                                           authenticationService.getOperator()
-                                                               .getUsername());
+                                                               .getNickname());
                 template = "vm/ts/dto.ts.vm";
                 break;
             case TS常量_枚举:
@@ -1190,49 +1190,49 @@ public class CagcServiceImpl
                                                 constEnum,
                                                 packageName,
                                                 authenticationService.getOperator()
-                                                                     .getUsername());
+                                                                     .getNickname());
                 template = "vm/ts/const_enum.ts.vm";
                 break;
             case TS接口服务:
                 context = getTSServiceContext(table,
                                               packageName,
                                               authenticationService.getOperator()
-                                                                   .getUsername());
+                                                                   .getNickname());
                 template = "vm/ts/service.ts.vm";
                 break;
             case Vue管理页:
                 context = getVueIndexContext(table,
                                              packageName,
                                              authenticationService.getOperator()
-                                                                  .getUsername());
+                                                                  .getNickname());
                 template = "vm/vue/index.vue.vm";
                 break;
             case Vue详情页:
                 context = getVueDetailsContext(table,
                                                packageName,
                                                authenticationService.getOperator()
-                                                                    .getUsername());
+                                                                    .getNickname());
                 template = "vm/vue/details.vue.vm";
                 break;
             case Vue新增页:
                 context = getVueAddContext(table,
                                            packageName,
                                            authenticationService.getOperator()
-                                                                .getUsername());
+                                                                .getNickname());
                 template = "vm/vue/add.vue.vm";
                 break;
             case Vue编辑页:
                 context = getVueEditContext(table,
                                             packageName,
                                             authenticationService.getOperator()
-                                                                 .getUsername());
+                                                                 .getNickname());
                 template = "vm/vue/edit.vue.vm";
                 break;
             case 添加菜单的Sql语句:
                 context = getSqlMenuContext(table,
                                             packageName,
                                             authenticationService.getOperator()
-                                                                 .getUsername());
+                                                                 .getNickname());
                 template = "vm/sql/menu.sql.vm";
                 break;
             default:

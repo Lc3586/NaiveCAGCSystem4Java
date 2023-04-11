@@ -156,7 +156,7 @@ public class TableServiceImpl
                 data.setName(tableInfo.getName());
                 data.setTitle(tableInfo.getComment());
                 data.setSignature(authenticationService.getOperator()
-                                                       .getUsername());
+                                                       .getNickname());
 //                data.setDescription(tableInfo.getComment());
                 String[] modelWithName = tableInfo.getName()
                                                   .split("_",

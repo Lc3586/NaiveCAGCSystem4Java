@@ -1,6 +1,7 @@
 package top.lctr.naive.cagc.system.configures;
 
 import io.swagger.models.auth.In;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,8 @@ public class SwaggerConfigure {
     /**
      * 反向代理路径
      */
-    public static String pathMapping = "/";
+    @Value("${server.servlet.context-path}")
+    public String pathMapping;
 
     /**
      * 创建API
